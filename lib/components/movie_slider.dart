@@ -95,7 +95,7 @@ class _MovieSliderState extends State<MovieSlider> {
                   // gridDelegate:
                   //     const SliverGridDelegateWithFixedCrossAxisCount(
                   //         crossAxisCount: 2),
-                  itemCount: 15,
+                  itemCount: 10,
                   // shrinkWrap: true,
                   padding: const EdgeInsets.all(10),
                   scrollDirection: Axis.horizontal,

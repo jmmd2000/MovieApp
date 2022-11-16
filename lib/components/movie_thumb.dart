@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../components/movie_page.dart';
 // import 'package:flutter/src/widgets/container.dart';
 // import 'package:flutter/src/widgets/framework.dart';
 
@@ -11,14 +12,9 @@ class MovieThumb extends StatefulWidget {
       required this.posterPath,
       required this.rating,
       required this.movieId});
-  // required this.posterPath,
-  // required this.rating,
-  // required this.movieId});
 
   @override
   State<MovieThumb> createState() => _MovieThumbState();
-  // _MovieThumbState(posterPath, rating, movieId);
-
 }
 
 class _MovieThumbState extends State<MovieThumb> {
@@ -37,9 +33,14 @@ class _MovieThumbState extends State<MovieThumb> {
     // );
     return GestureDetector(
       onTap: () {
-        // const snackBar = SnackBar(content: Text('$this.movieId'));
-
-        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MoviePage(
+                    api:
+                        'https://api.themoviedb.org/3/movie/${widget.movieId}?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US',
+                  )),
+        );
       },
       child: Card(
         // semanticContainer: true,

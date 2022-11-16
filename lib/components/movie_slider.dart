@@ -14,20 +14,23 @@ class MovieSlider extends StatefulWidget {
 
   @override
   // ignore: no_logic_in_create_state
-  State<MovieSlider> createState() => _MovieSliderState(api, sliderTitle);
+  State<MovieSlider> createState() => _MovieSliderState();
+  // State<MovieSlider> createState() => _MovieSliderState(api, sliderTitle);
+
 }
 
 class _MovieSliderState extends State<MovieSlider> {
   late Future<String> futureMovie;
-  late String api;
+  // late String api;
 
-  String sliderTitle;
-  _MovieSliderState(this.api, this.sliderTitle);
+  // String sliderTitle;
+  _MovieSliderState();
+  // _MovieSliderState(this.api, this.sliderTitle);
 
   @override
   void initState() {
     super.initState();
-    futureMovie = fetchMovie(api);
+    futureMovie = fetchMovie(widget.api);
   }
 
   @override
@@ -64,7 +67,7 @@ class _MovieSliderState extends State<MovieSlider> {
                   Padding(
                     padding: const EdgeInsets.only(top: 15, left: 15),
                     child: Text(
-                      sliderTitle,
+                      widget.sliderTitle,
                       style: TextStyle(
                         color: Colors.grey[800],
                         fontWeight: FontWeight.bold,

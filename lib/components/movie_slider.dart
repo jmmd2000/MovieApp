@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../components/movie_thumb.dart';
+import '../colours.dart';
 
 class MovieSlider extends StatefulWidget {
   final String api;
@@ -65,11 +66,13 @@ class _MovieSliderState extends State<MovieSlider> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: 15, left: 15),
+                    padding:
+                        const EdgeInsets.only(top: 15, left: 15, bottom: 5),
                     child: Text(
                       widget.sliderTitle,
-                      style: TextStyle(
-                        color: Colors.grey[800],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        // color: Colors.grey[800],
                         fontWeight: FontWeight.bold,
                         fontSize: 22,
                       ),
@@ -78,8 +81,8 @@ class _MovieSliderState extends State<MovieSlider> {
                 ],
               ),
 
-              Divider(
-                color: Colors.green.shade500,
+              const Divider(
+                color: secondaryColour,
                 indent: 10,
                 endIndent: 10,
                 height: 5,
@@ -119,7 +122,10 @@ class _MovieSliderState extends State<MovieSlider> {
         return const Center(
           child: Padding(
             padding: EdgeInsets.all(40),
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(
+              color: secondaryDarker,
+              backgroundColor: secondaryColour,
+            ),
           ),
         );
       },

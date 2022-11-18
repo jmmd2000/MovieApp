@@ -1,12 +1,7 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
-
-// import 'dart:async';
-// import 'dart:convert';
-// import 'dart:ffi';
-
 import 'package:api/pages/saved_page.dart';
 import 'package:api/pages/discover_page.dart';
 import 'package:flutter/material.dart';
+import 'colours.dart';
 // import 'package:http/http.dart' as http;
 
 // Future<String> fetchMovie() async {
@@ -70,17 +65,9 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  // late Future<String> futureMovie;
-
-  // @override
-  // void initState() {
-  // super.initState();
-  // futureMovie = fetchMovie();
-  // }
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Cinematica',
       // theme: ThemeData(
       //   primarySwatch: Colors.blue,
@@ -102,8 +89,8 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int currentIndex = 0;
   final screens = [
-    DiscoverPage(),
-    SavedPage(),
+    const DiscoverPage(),
+    const SavedPage(),
   ];
 
   @override
@@ -112,9 +99,10 @@ class _MainPageState extends State<MainPage> {
         title: 'Cinematica',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch().copyWith(
-            primary: const Color(0xFF343A40),
-            secondary: const Color(0xFFFFC107),
+            primary: primaryColour,
+            secondary: secondaryColour,
           ),
+          scaffoldBackgroundColor: bodyBackground,
         ),
         home: Scaffold(
           // appBar: AppBar(
@@ -131,12 +119,12 @@ class _MainPageState extends State<MainPage> {
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: currentIndex,
             onTap: (index) => setState(() => currentIndex = index),
-            backgroundColor: Color(0xFF343A40),
-            selectedItemColor: Colors.green.shade500,
-            unselectedItemColor: Colors.green.shade800,
+            backgroundColor: primaryColour,
+            selectedItemColor: secondaryColour,
+            unselectedItemColor: secondaryDarker,
             // selectedFontSize: 14,
             showUnselectedLabels: false,
-            items: <BottomNavigationBarItem>[
+            items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.explore),
                 label: "Discover",

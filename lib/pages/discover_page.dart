@@ -7,6 +7,7 @@
 
 import '../components/movie_slider.dart';
 import 'package:flutter/material.dart';
+import '../colours.dart';
 // import 'package:http/http.dart' as http;
 
 // Future<String> fetchMovie() async {

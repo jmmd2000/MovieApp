@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../components/movie_page.dart';
+import '../colours.dart';
 // import 'package:flutter/src/widgets/container.dart';
 // import 'package:flutter/src/widgets/framework.dart';
 
@@ -50,7 +51,7 @@ class _MovieThumbState extends State<MovieThumb> {
         // margin: EdgeInsets.all(5),
         // child: Center(child: Text("${resultItem['title']}")),
         child: Center(
-          child: Column(children: [
+          child: Stack(children: [
             // Text('${resultItem['title']}'),
             Image.network(
               'https://image.tmdb.org/t/p/w500${widget.posterPath}',
@@ -59,8 +60,19 @@ class _MovieThumbState extends State<MovieThumb> {
               fit: BoxFit.cover,
               // width: 150,
             ),
-            // Text(rating),
-            // Text(movieId),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Container(
+                padding:
+                    const EdgeInsets.only(left: 5, right: 5, top: 2, bottom: 2),
+                decoration: BoxDecoration(
+                    color: secondaryColour
+                        .withOpacity(0.9)), //here i want to add opacity
+
+                child: Text(widget.rating),
+              ),
+            ),
           ]),
         ),
       ),

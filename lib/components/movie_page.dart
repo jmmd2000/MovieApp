@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 // ignore: implementation_imports
 import 'package:http/http.dart' as http;
+import 'package:navbar_router/navbar_router.dart';
+import '../colours.dart';
 
 class MoviePage extends StatefulWidget {
   final String api;
@@ -36,34 +38,61 @@ class _MoviePageState extends State<MoviePage> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               Map jsonMap = json.decode(snapshot.data!);
-              // movieTitle = jsonMap['title'];
-              // Map resultItem = jsonMap['results'];
-              // return Text(snapshot.data!.title);
-              // return ListView(
-              //   children: [
-              //     Text(snapshot.data!.title),
-              //     Image.network(
-              //         'https://image.tmdb.org/t/p/w500${snapshot.data!.backdrop}'),
-              //     Image.network(
-              //         'https://image.tmdb.org/t/p/w500${snapshot.data!.poster}'),
-              //     Text(snapshot.data!.id.toString()),
-              //     Text(snapshot.data!.blurb),
-              //     Text(snapshot.data!.releaseDate),
-              //   ],
-              // );
               return ListView(
                 children: [
-                  // Text(futureMovie.toString()),
-                  // Text("test"),
-
+                  // This is the banner image at the top of the page
                   Image.network(
                       'https://image.tmdb.org/t/p/w500${jsonMap['backdrop_path']}'),
-                  Text(jsonMap['title']),
-                  // Image.network(
-                  //     'https://image.tmdb.org/t/p/w500${snapshot.data!.poster}'),
-                  // Text(snapshot.data!.id.toString()),
-                  // Text(snapshot.data!.blurb),
-                  // Text(snapshot.data!.releaseDate),
+                  // This is the overview of the movie below the poster
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      jsonMap['overview'],
+                      style: const TextStyle(color: fontPrimary),
+                    ),
+                  ),
+                  const Divider(
+                    color: secondaryColour,
+                    indent: 10,
+                    endIndent: 10,
+                    height: 5,
+                    thickness: 2,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 0, bottom: 8, left: 16, right: 16),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          height: 100.0,
+                          child: ListView.builder(
+                            itemCount: jsonMap['genres'].length,
+                            padding: const EdgeInsets.all(10),
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (BuildContext c, int i) {
+                              Map genre = jsonMap['genres'][i];
+                              return Container(
+                                margin: const EdgeInsets.only(
+                                    left: 5.0, right: 5.0),
+                                child: Chip(
+                                  elevation: 20,
+                                  padding:
+                                      const EdgeInsets.only(left: 8, right: 8),
+                                  backgroundColor: secondaryColour,
+                                  shadowColor: Colors.black,
+                                  label: Text(
+                                    genre['name'],
+                                    style: const TextStyle(fontSize: 12),
+                                  ), //Text
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               );
             } else if (snapshot.hasError) {
@@ -74,7 +103,10 @@ class _MoviePageState extends State<MoviePage> {
             return const Center(
               child: Padding(
                 padding: EdgeInsets.all(40),
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: secondaryDarker,
+                  backgroundColor: secondaryColour,
+                ),
               ),
             );
           },

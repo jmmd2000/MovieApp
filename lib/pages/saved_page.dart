@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import '../colours.dart';
 
 class SavedPage extends StatefulWidget {
   const SavedPage({super.key});
@@ -29,8 +30,9 @@ class _SavedPageState extends State<SavedPage> {
       appBar: AppBar(
         title: Text('Saved Page'),
       ),
-      body:
-          Center(child: Text('Saved $counter', style: TextStyle(fontSize: 60))),
+      body: Center(
+          child: Text('Saved $counter',
+              style: TextStyle(fontSize: 60, color: fontPrimary))),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',

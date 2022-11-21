@@ -1,4 +1,4 @@
-// This file contains all the colours used for this project
+// This file contains all the colours and font styles used for this project
 
 import 'package:flutter/material.dart';
 
@@ -7,3 +7,24 @@ const secondaryColour = Color(0xFF4CAF50);
 const secondaryDarker = Color(0xFF2E7D32);
 const bodyBackground = Color(0xFF1f2326);
 const fontPrimary = Color(0xFFD3D3D3);
+const softWhite = Color.fromARGB(255, 224, 218, 218);
+
+TextStyle textPrimary = const TextStyle(color: fontPrimary);
+TextStyle textPrimary12 = const TextStyle(color: fontPrimary, fontSize: 12);
+TextStyle textPrimary14 = const TextStyle(color: fontPrimary, fontSize: 14);
+TextStyle textPrimary16 = const TextStyle(color: fontPrimary, fontSize: 16);
+TextStyle textPrimaryBold18 = const TextStyle(
+    color: fontPrimary, fontSize: 18, fontWeight: FontWeight.bold);
+TextStyle textPrimaryBold28 = const TextStyle(
+    color: fontPrimary, fontSize: 28, fontWeight: FontWeight.bold);
+
+TextStyle textSecondary = const TextStyle(color: secondaryColour);
+TextStyle textSecondaryBold28 = const TextStyle(
+    color: secondaryColour, fontSize: 28, fontWeight: FontWeight.bold);
+
+TextStyle textSecondary12 =
+    const TextStyle(color: secondaryColour, fontSize: 12);
+TextStyle textSecondary14 =
+    const TextStyle(color: secondaryColour, fontSize: 14);
+TextStyle textSecondary16 =
+    const TextStyle(color: secondaryColour, fontSize: 16);

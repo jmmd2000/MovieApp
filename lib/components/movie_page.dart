@@ -1,15 +1,26 @@
 // ignore: implementation_imports
 import 'dart:convert';
+// import 'dart:html';
 
+import 'package:api/components/functions/round_rating.dart';
+import 'package:api/components/functions/random_number.dart';
 import 'package:flutter/material.dart';
 // ignore: implementation_imports
 import 'package:http/http.dart' as http;
-import 'package:navbar_router/navbar_router.dart';
+import 'package:intl/intl.dart';
 import '../colours.dart';
+import 'comment_card.dart';
+import 'comment_list.dart';
 
 class MoviePage extends StatefulWidget {
   final String api;
-  const MoviePage({super.key, required this.api});
+  final String reviewsAPI;
+  final String movieID;
+  const MoviePage(
+      {super.key,
+      required this.api,
+      required this.reviewsAPI,
+      required this.movieID});
 
   @override
   State<MoviePage> createState() => _MoviePageState();
@@ -17,17 +28,20 @@ class MoviePage extends StatefulWidget {
 
 class _MoviePageState extends State<MoviePage> {
   late Future<String> futureMovie;
+  late Future<String> reviews;
   late String movieTitle = " ";
-  // late String movieTitle = " ";
 
   @override
   void initState() {
     super.initState();
     futureMovie = fetchMovie(widget.api);
+    reviews = fetchReviews(widget.reviewsAPI);
   }
 
   @override
   Widget build(BuildContext context) {
+    int count = 0;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(movieTitle),
@@ -38,17 +52,174 @@ class _MoviePageState extends State<MoviePage> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               Map jsonMap = json.decode(snapshot.data!);
+              // This parses the release date value from the API response so it can be displayed in a nicer way
+              DateTime relDate = DateTime.parse(jsonMap['release_date']);
+              // This is from the 'intl' package and parses a number to a nicer format
+              final value = NumberFormat("#,###", "en_US");
               return ListView(
                 children: [
                   // This is the banner image at the top of the page
                   Image.network(
                       'https://image.tmdb.org/t/p/w500${jsonMap['backdrop_path']}'),
-                  // This is the overview of the movie below the poster
+                  // This is the tagline of the movie below the poster
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 16, bottom: 0, left: 16, right: 16),
+                    child: Column(children: [
+                      Text(
+                        // jsonMap['tagline'] ?? "loading...",
+                        '"${jsonMap['tagline']}"',
+                        style: const TextStyle(color: fontPrimary),
+                      ),
+                    ]),
+                  ),
+                  // This is the overview of the movie
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      jsonMap['overview'],
-                      style: const TextStyle(color: fontPrimary),
+                    child: Column(children: [
+                      Text(
+                        jsonMap['overview'],
+                        style: const TextStyle(color: fontPrimary),
+                      ),
+                    ]),
+                  ),
+                  const Divider(
+                    color: secondaryColour,
+                    indent: 10,
+                    endIndent: 10,
+                    height: 5,
+                    thickness: 2,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: secondaryColour,
+                          radius: 35,
+                          child: Text(
+                            roundRating(
+                                jsonMap['vote_average'].toString(), count),
+                            style: textPrimaryBold28,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Text(
+                            "${value.format(jsonMap['vote_count']).toString()} votes",
+                            style: textPrimaryBold18,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 0, bottom: 0, left: 16, right: 16),
+                    child: Column(
+                      children: [
+                        // Center(
+                        //   child:
+                        Container(
+                          width: double.infinity,
+                          height: 75.0,
+                          alignment: Alignment.center,
+                          child: ListView.builder(
+                            itemCount: jsonMap['genres'].length,
+                            padding: const EdgeInsets.all(10),
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            itemBuilder: (BuildContext c, int i) {
+                              Map genre = jsonMap['genres'][i];
+                              return Container(
+                                margin:
+                                    const EdgeInsets.only(left: 0, right: 5.0),
+                                child: Wrap(
+                                  // crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Chip(
+                                      elevation: 20,
+                                      padding: const EdgeInsets.only(
+                                          left: 8, right: 8),
+                                      backgroundColor: secondaryColour,
+                                      shadowColor: Colors.black,
+                                      label: Text(
+                                        genre['name'],
+                                        style: const TextStyle(fontSize: 12),
+                                      ), //Text
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        // ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 0, bottom: 8, left: 16, right: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(children: [
+                          Text(
+                            "Released:",
+                            style: textSecondary16,
+                          ),
+                          const Spacer(),
+                          Text(
+                            "${relDate.day}/${relDate.month}/${relDate.year}",
+                            style: textPrimary16,
+                          )
+                        ]),
+                        Row(children: [
+                          Text(
+                            "Runtime:",
+                            style: textSecondary16,
+                          ),
+                          const Spacer(),
+                          Text(
+                            "${jsonMap['runtime']} minutes",
+                            style: textPrimary16,
+                          )
+                        ]),
+                        Row(children: [
+                          Text(
+                            "Budget:",
+                            style: textSecondary16,
+                          ),
+                          const Spacer(),
+                          Text(
+                            "\$${value.format(jsonMap['budget'])}",
+                            style: textPrimary16,
+                          )
+                        ]),
+                        Row(children: [
+                          Text(
+                            "Revenue:",
+                            style: textSecondary16,
+                          ),
+                          const Spacer(),
+                          Text(
+                            "\$${value.format(jsonMap['revenue'])}",
+                            style: textPrimary16,
+                          )
+                        ]),
+                        Row(children: [
+                          Text(
+                            "Original Country:",
+                            style: textSecondary16,
+                          ),
+                          const Spacer(),
+                          Text(
+                            "${jsonMap['production_companies'][0]['origin_country']}",
+                            style: textPrimary16,
+                          )
+                        ]),
+                      ],
                     ),
                   ),
                   const Divider(
@@ -59,39 +230,77 @@ class _MoviePageState extends State<MoviePage> {
                     thickness: 2,
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(
-                        top: 0, bottom: 8, left: 16, right: 16),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          height: 100.0,
-                          child: ListView.builder(
-                            itemCount: jsonMap['genres'].length,
-                            padding: const EdgeInsets.all(10),
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: (BuildContext c, int i) {
-                              Map genre = jsonMap['genres'][i];
-                              return Container(
-                                margin: const EdgeInsets.only(
-                                    left: 5.0, right: 5.0),
-                                child: Chip(
-                                  elevation: 20,
-                                  padding:
-                                      const EdgeInsets.only(left: 8, right: 8),
-                                  backgroundColor: secondaryColour,
-                                  shadowColor: Colors.black,
-                                  label: Text(
-                                    genre['name'],
-                                    style: const TextStyle(fontSize: 12),
-                                  ), //Text
-                                ),
-                              );
-                            },
-                          ),
-                        )
-                      ],
+                    padding:
+                        const EdgeInsets.only(left: 10, top: 10, bottom: 10),
+                    child: Text(
+                      "User Reviews",
+                      style: textPrimaryBold28,
                     ),
+                  ),
+                  FutureBuilder<String>(
+                    future: reviews,
+                    builder: (context, reviewSnapshot) {
+                      if (reviewSnapshot.hasData) {
+                        Map jsonMapReviews = json.decode(reviewSnapshot.data!);
+                        if (jsonMapReviews['results'].length > 0) {
+                          int ranNum =
+                              randomNumber(0, jsonMapReviews['results'].length);
+// This parses the release date value from the API response so it can be displayed in a nicer way
+                          return Column(
+                            children: [
+                              CommentCard(
+                                authorUsername: jsonMapReviews['results']
+                                    [ranNum]['author_details']['username'],
+                                profilePicture: jsonMapReviews['results']
+                                    [ranNum]['author_details']['avatar_path'],
+                                reviewContent: jsonMapReviews['results'][ranNum]
+                                    ['content'],
+                                reviewRating: jsonMapReviews['results'][ranNum]
+                                        ['author_details']['rating']
+                                    .toString(),
+                                reviewDate: jsonMapReviews['results'][ranNum]
+                                    ['created_at'],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(18),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => CommentList(
+                                                api:
+                                                    'https://api.themoviedb.org/3/movie/${widget.movieID}/reviews?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US',
+                                              )),
+                                    );
+                                  },
+                                  child: const Text("See all user reviews"),
+                                ),
+                              )
+                            ],
+                          );
+                        } else {
+                          return Text(
+                            "No reviews",
+                            style: textPrimaryBold18,
+                            textAlign: TextAlign.center,
+                          );
+                        }
+                      } else if (reviewSnapshot.hasError) {
+                        return Text('${reviewSnapshot.error}');
+                      }
+
+                      // By default, show a loading spinner, this is for the reviews section
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40),
+                          child: CircularProgressIndicator(
+                            color: secondaryDarker,
+                            backgroundColor: secondaryColour,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               );
@@ -134,6 +343,20 @@ class _MoviePageState extends State<MoviePage> {
       // If the server did not return a 200 OK response,
       // then throw an exception.
       throw Exception('Failed to load movie information');
+    }
+  }
+
+  Future<String> fetchReviews(String api) async {
+    // https://api.themoviedb.org/3/movie/{movie_id}/reviews?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US
+    final response = await http.get(Uri.parse(api));
+    if (response.statusCode == 200) {
+      setState(() {
+        // ignore: unused_local_variable
+        var reviewRes = json.decode(response.body);
+      });
+      return response.body;
+    } else {
+      throw Exception('Failed to load reviews');
     }
   }
 }

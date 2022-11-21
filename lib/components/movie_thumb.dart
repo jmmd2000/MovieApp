@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../components/movie_page.dart';
 import '../colours.dart';
-// import 'package:flutter/src/widgets/container.dart';
-// import 'package:flutter/src/widgets/framework.dart';
+import 'functions/round_rating.dart';
+import 'dart:core';
 
 class MovieThumb extends StatefulWidget {
   final String posterPath;
@@ -19,19 +19,14 @@ class MovieThumb extends StatefulWidget {
 }
 
 class _MovieThumbState extends State<MovieThumb> {
-  // late String posterPath;
-  // late String rating;
-  // late String movieId;
+  late double ratingRounded = double.parse(widget.rating);
+  String ratingString = "";
   _MovieThumbState();
-  // _MovieThumbState(this.posterPath, this.rating, this.movieId);
 
   @override
   Widget build(BuildContext context) {
-    // return const SizedBox(
-    //   height: 200,
-    //   width: 150,
-    //   child: Text("test"),
-    // );
+    ratingString = widget.rating.toString();
+    int count = 0;
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -40,25 +35,21 @@ class _MovieThumbState extends State<MovieThumb> {
               builder: (context) => MoviePage(
                     api:
                         'https://api.themoviedb.org/3/movie/${widget.movieId}?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US',
+                    reviewsAPI:
+                        'https://api.themoviedb.org/3/movie/${widget.movieId}/reviews?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US&page=1',
+                    movieID: widget.movieId,
                   )),
         );
       },
       child: Card(
-        // semanticContainer: true,
-        // clipBehavior: Clip.antiAliasWithSaveLayer,
         elevation: 5,
-        // shadowColor: Colors.blue,
-        // margin: EdgeInsets.all(5),
-        // child: Center(child: Text("${resultItem['title']}")),
         child: Center(
           child: Stack(children: [
-            // Text('${resultItem['title']}'),
             Image.network(
               'https://image.tmdb.org/t/p/w500${widget.posterPath}',
               height: 172,
-              width: 120,
+              width: 121,
               fit: BoxFit.cover,
-              // width: 150,
             ),
             Positioned(
               top: 0,
@@ -66,11 +57,12 @@ class _MovieThumbState extends State<MovieThumb> {
               child: Container(
                 padding:
                     const EdgeInsets.only(left: 5, right: 5, top: 2, bottom: 2),
-                decoration: BoxDecoration(
-                    color: secondaryColour
-                        .withOpacity(0.9)), //here i want to add opacity
-
-                child: Text(widget.rating),
+                decoration:
+                    BoxDecoration(color: secondaryColour.withOpacity(0.9)),
+                child: Text(
+                  (roundRating(widget.rating, count)),
+                  style: const TextStyle(fontSize: 12, color: fontPrimary),
+                ),
               ),
             ),
           ]),

@@ -5,9 +5,10 @@
 // import 'dart:ffi';
 // import 'dart:html'
 
+// import 'package:api/colours.dart';
+
 import '../components/movie_slider.dart';
 import 'package:flutter/material.dart';
-import '../colours.dart';
 // import 'package:http/http.dart' as http;
 
 // Future<String> fetchMovie() async {
@@ -35,7 +36,7 @@ class DiscoverPage extends StatefulWidget {
 }
 
 class _DiscoverPageState extends State<DiscoverPage> {
-  int counter = 0;
+  // int counter = 0;
 
   // void _incrementCounter() {
   // setState(() {
@@ -53,27 +54,34 @@ class _DiscoverPageState extends State<DiscoverPage> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Discover Page'),
+          actions: const [
+            IconButton(
+              onPressed: null,
+              icon: Icon(
+                Icons.search,
+                color: Colors.white,
+                size: 28,
+              ),
+              color: Colors.white,
+              highlightColor: Colors.white,
+            )
+          ],
         ),
         body: ListView(
           scrollDirection: Axis.vertical,
           children: const [
             MovieSlider(
-              sliderTitle: "Trending",
-              api:
-                  'https://api.themoviedb.org/3/movie/popular?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US&page=1',
-            ),
+                sliderTitle: "Trending Daily",
+                api:
+                    'https://api.themoviedb.org/3/trending/movie/day?&api_key=21cc517d0bad572120d1663613b3a1a7'),
+            MovieSlider(
+                sliderTitle: "Trending Weekly",
+                api:
+                    'https://api.themoviedb.org/3/trending/movie/week?&api_key=21cc517d0bad572120d1663613b3a1a7'),
             MovieSlider(
                 sliderTitle: "Upcoming",
                 api:
                     'https://api.themoviedb.org/3/movie/upcoming?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US&page=1'),
-            MovieSlider(
-                sliderTitle: "Upcoming 2",
-                api:
-                    'https://api.themoviedb.org/3/movie/upcoming?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US&page=2'),
-            MovieSlider(
-                sliderTitle: "Upcoming 3",
-                api:
-                    'https://api.themoviedb.org/3/movie/upcoming?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US&page=3'),
           ],
         ));
   }

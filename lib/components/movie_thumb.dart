@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../components/movie_page.dart';
+import 'movie_page.dart';
 import '../colours.dart';
 import 'functions/round_rating.dart';
+import 'functions/get_image.dart';
 import 'dart:core';
 
 class MovieThumb extends StatefulWidget {
@@ -41,16 +42,17 @@ class _MovieThumbState extends State<MovieThumb> {
                   )),
         );
       },
-      child: Card(
-        elevation: 5,
+      child: Container(
+        // elevation: 5,
         child: Center(
           child: Stack(children: [
-            Image.network(
-              'https://image.tmdb.org/t/p/w500${widget.posterPath}',
-              height: 172,
-              width: 121,
-              fit: BoxFit.cover,
-            ),
+            getMovieThumbImage(widget.posterPath),
+            // Image.network(
+            //   'https://image.tmdb.org/t/p/w500${widget.posterPath}',
+            //   height: 172,
+            //   width: 121,
+            //   fit: BoxFit.cover,
+            // ),
             Positioned(
               top: 0,
               right: 0,

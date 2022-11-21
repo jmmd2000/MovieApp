@@ -43,15 +43,15 @@ class CommentCard extends StatelessWidget {
               ),
               child: Row(children: [
                 Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.only(left: 12, top: 6, bottom: 6),
                   child: CircleAvatar(
                     backgroundImage: getImage(profilePicture),
                     backgroundColor: secondaryColour,
-                    radius: 35,
+                    radius: 25,
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.only(left: 20),
                   child: Text(
                     nullCheck(authorUsername),
                     style: textPrimaryBold18,
@@ -62,10 +62,10 @@ class CommentCard extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   child: CircleAvatar(
                     backgroundColor: bodyBackground,
-                    radius: 25,
+                    radius: 20,
                     child: Text(
                       roundRating(nullCheck(reviewRating), count),
-                      style: textSecondaryBold28,
+                      style: textSecondaryBold20,
                     ),
                   ),
                 )

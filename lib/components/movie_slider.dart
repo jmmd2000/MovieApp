@@ -41,27 +41,8 @@ class _MovieSliderState extends State<MovieSlider> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           Map jsonMap = json.decode(snapshot.data!);
-          // return Text(snapshot.data!.title);
-          // return ListView(
-          //   children: [
-          //     Text(snapshot.data!.title),
-          //     Image.network(
-          //         'https://image.tmdb.org/t/p/w500${snapshot.data!.backdrop}'),
-          //     Image.network(
-          //         'https://image.tmdb.org/t/p/w500${snapshot.data!.poster}'),
-          //     Text(snapshot.data!.id.toString()),
-          //     Text(snapshot.data!.blurb),
-          //     Text(snapshot.data!.releaseDate),
-          //   ],
-          // );
           return Column(
             children: [
-              // Wrap(
-              //   direction: Axis.horizontal,
-              //   crossAxisAlignment: WrapCrossAlignment.end,
-              //   spacing: 5,
-              //   runSpacing: 5,
-              //   children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -80,7 +61,6 @@ class _MovieSliderState extends State<MovieSlider> {
                   ),
                 ],
               ),
-
               const Divider(
                 color: secondaryColour,
                 indent: 10,
@@ -88,26 +68,21 @@ class _MovieSliderState extends State<MovieSlider> {
                 height: 5,
                 thickness: 2,
               ),
-
-              // ],
-              //
-              // ),
               SizedBox(
                 height: 200,
                 child: ListView.builder(
-                  // gridDelegate:
-                  //     const SliverGridDelegateWithFixedCrossAxisCount(
-                  //         crossAxisCount: 2),
                   itemCount: 10,
-                  // shrinkWrap: true,
                   padding: const EdgeInsets.all(10),
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (BuildContext c, int i) {
                     Map resultItem = jsonMap['results'][i];
-                    return MovieThumb(
-                      posterPath: resultItem['poster_path'],
-                      rating: resultItem['vote_average'].toString(),
-                      movieId: resultItem['id'].toString(),
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: MovieThumb(
+                        posterPath: resultItem['poster_path'],
+                        rating: resultItem['vote_average'].toString(),
+                        movieId: resultItem['id'].toString(),
+                      ),
                     );
                   },
                 ),

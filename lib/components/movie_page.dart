@@ -4,15 +4,20 @@ import 'dart:convert';
 
 import 'package:api/components/functions/round_rating.dart';
 import 'package:api/components/functions/random_number.dart';
+import 'package:api/components/functions/null_check.dart';
 import 'package:flutter/material.dart';
 // ignore: implementation_imports
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:navbar_router/navbar_router.dart';
 import '../colours.dart';
 import 'comment_card.dart';
 import 'comment_list.dart';
+import 'functions/get_image.dart';
 
 class MoviePage extends StatefulWidget {
+// class MoviePage extends StatelessWidget {
+
   final String api;
   final String reviewsAPI;
   final String movieID;
@@ -53,14 +58,23 @@ class _MoviePageState extends State<MoviePage> {
             if (snapshot.hasData) {
               Map jsonMap = json.decode(snapshot.data!);
               // This parses the release date value from the API response so it can be displayed in a nicer way
-              DateTime relDate = DateTime.parse(jsonMap['release_date']);
+              DateTime relDate =
+                  DateTime.parse(nullCheck(jsonMap['release_date']));
               // This is from the 'intl' package and parses a number to a nicer format
               final value = NumberFormat("#,###", "en_US");
               return ListView(
                 children: [
+                  Column(
+                    // scrollDirection: Axis.vertical,
+                    children: [
+                      getMovieImage(jsonMap['backdrop_path']),
+                      // getMovieImage(jsonMap['poster_path']),
+                    ],
+                  ),
+
                   // This is the banner image at the top of the page
-                  Image.network(
-                      'https://image.tmdb.org/t/p/w500${jsonMap['backdrop_path']}'),
+                  // Image.network(
+                  //     'https://image.tmdb.org/t/p/w500${jsonMap['backdrop_path']}'),
                   // This is the tagline of the movie below the poster
                   Padding(
                     padding: const EdgeInsets.only(
@@ -68,7 +82,7 @@ class _MoviePageState extends State<MoviePage> {
                     child: Column(children: [
                       Text(
                         // jsonMap['tagline'] ?? "loading...",
-                        '"${jsonMap['tagline']}"',
+                        '"${nullCheck(jsonMap['tagline'])}"',
                         style: const TextStyle(color: fontPrimary),
                       ),
                     ]),
@@ -78,7 +92,7 @@ class _MoviePageState extends State<MoviePage> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(children: [
                       Text(
-                        jsonMap['overview'],
+                        nullCheck(jsonMap['overview']),
                         style: const TextStyle(color: fontPrimary),
                       ),
                     ]),
@@ -99,14 +113,15 @@ class _MoviePageState extends State<MoviePage> {
                           radius: 35,
                           child: Text(
                             roundRating(
-                                jsonMap['vote_average'].toString(), count),
+                                nullCheck(jsonMap['vote_average'].toString()),
+                                count),
                             style: textPrimaryBold28,
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(10),
                           child: Text(
-                            "${value.format(jsonMap['vote_count']).toString()} votes",
+                            "${nullCheck(value.format(jsonMap['vote_count'])).toString()} votes",
                             style: textPrimaryBold18,
                           ),
                         )
@@ -182,7 +197,7 @@ class _MoviePageState extends State<MoviePage> {
                           ),
                           const Spacer(),
                           Text(
-                            "${jsonMap['runtime']} minutes",
+                            "${nullCheck(jsonMap['runtime'])} minutes",
                             style: textPrimary16,
                           )
                         ]),
@@ -193,7 +208,7 @@ class _MoviePageState extends State<MoviePage> {
                           ),
                           const Spacer(),
                           Text(
-                            "\$${value.format(jsonMap['budget'])}",
+                            "\$${nullCheck(value.format(jsonMap['budget']))}",
                             style: textPrimary16,
                           )
                         ]),
@@ -204,7 +219,7 @@ class _MoviePageState extends State<MoviePage> {
                           ),
                           const Spacer(),
                           Text(
-                            "\$${value.format(jsonMap['revenue'])}",
+                            "\$${nullCheck(value.format(jsonMap['revenue']))}",
                             style: textPrimary16,
                           )
                         ]),
@@ -214,10 +229,11 @@ class _MoviePageState extends State<MoviePage> {
                             style: textSecondary16,
                           ),
                           const Spacer(),
-                          Text(
-                            "${jsonMap['production_companies'][0]['origin_country']}",
-                            style: textPrimary16,
-                          )
+                          // Text(
+                          //   nullCheck(jsonMap['production_companies'][0]
+                          //       ['origin_country']),
+                          //   style: textPrimary16,
+                          // )
                         ]),
                       ],
                     ),
@@ -274,6 +290,11 @@ class _MoviePageState extends State<MoviePage> {
                                               )),
                                     );
                                   },
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            secondaryColour),
+                                  ),
                                   child: const Text("See all user reviews"),
                                 ),
                               )

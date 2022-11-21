@@ -18,3 +18,55 @@ ImageProvider getImage(path) {
     return const AssetImage('lib/assets/default.png');
   }
 }
+
+Widget getMovieImage(path) {
+  if (path != null) {
+    if (path.length > 0) {
+      if (path != "null") {
+        return Image.network('https://image.tmdb.org/t/p/w500$path');
+      } else {
+        return Image.asset("lib/assets/error.png");
+      }
+    } else {
+      return Image.asset("lib/assets/error.png");
+    }
+  } else {
+    return Image.asset("lib/assets/error.png");
+  }
+}
+
+Widget getMovieThumbImage(path) {
+  if (path != null) {
+    if (path.length > 0) {
+      if (path != "null") {
+        return Image.network(
+          'https://image.tmdb.org/t/p/w500$path',
+          height: 172,
+          width: 121,
+          fit: BoxFit.cover,
+        );
+      } else {
+        return Image.asset(
+          "lib/assets/error.png",
+          height: 172,
+          width: 121,
+          fit: BoxFit.cover,
+        );
+      }
+    } else {
+      return Image.asset(
+        "lib/assets/error.png",
+        height: 172,
+        width: 121,
+        fit: BoxFit.cover,
+      );
+    }
+  } else {
+    return Image.asset(
+      "lib/assets/error.png",
+      height: 172,
+      width: 121,
+      fit: BoxFit.cover,
+    );
+  }
+}

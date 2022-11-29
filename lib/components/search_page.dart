@@ -1,14 +1,12 @@
-import 'dart:convert';
+// This component is a page that lets the user search the database for any movie.
+// It contains a searchbar whos value is interpolated into the search url to return a GridView
+// of MovieThumbs. As the user scrolls to the bottom of the page it loads the next page of results.
 
+import 'dart:convert';
 import 'package:api/colours.dart';
 import 'package:api/components/movie_thumb.dart';
 import 'package:flutter/material.dart';
-import 'package:api/components/functions/get_image.dart';
-
-// import 'package:flutter/src/widgets/container.dart';
-// import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart' as http;
-import 'package:navbar_router/navbar_router.dart';
 
 // ignore: must_be_immutable
 class SearchPage extends StatefulWidget {
@@ -20,27 +18,54 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  String input = "test";
-  int result_count = 0;
-  List resultList = [];
+  late bool isLastPage;
+  late int pageNumber;
+  late bool error;
+  late bool loading;
+  late List<MovieThumb> resultList;
+  final int nextPageTrigger = 6;
+  late int lastPage;
+  late String resultCount = "0";
+  String apiURL = "";
+  String input = "dasfjhsihfbsfbsioyhubdvf";
+  final controller = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    // results = fetchResults(widget.api);
+    pageNumber = 1;
+    resultList = [];
+    isLastPage = false;
+    loading = true;
+    error = false;
+    apiURL = widget.api;
+    controller.addListener(() {
+      if (controller.position.atEdge) {
+        bool isTop = controller.position.pixels == 0;
+        if (!isTop) {
+          setState(() {
+            if (pageNumber < lastPage) {
+              pageNumber++;
+              widget.api = apiURL.replaceAll("{*}", pageNumber.toString());
+              widget.api = widget.api.replaceAll("{...}", input.toString());
+              fetchResults(widget.api);
+            }
+          });
+        }
+      }
+    });
   }
-
-  // @override
-  // void dispose() {
-  //   // ignore: avoid_print
-  //   print('Dispose used');
-  //   super.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -50,126 +75,174 @@ class _SearchPageState extends State<SearchPage> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: const Color(0xFFFFFFFF),
-                  // isDense: true,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  /* -- Text and Icon -- */
+                  // Text and Icon
                   hintText: "Search movies...",
                   hintStyle: const TextStyle(
                     fontSize: 14,
                     color: secondaryColour,
-                  ), // TextStyle
-                  /* -- Border Styling -- */
+                  ),
+                  // Border Styling
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: const BorderSide(
                       width: 1,
                       color: secondaryColour,
-                    ), // BorderSide
-                  ), // OutlineInputBorder
+                    ),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: const BorderSide(
                       width: 1,
                       color: secondaryColour,
-                    ), // BorderSide
-                  ), // OutlineInputBorder
+                    ),
+                  ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: const BorderSide(
                       width: 1,
                       color: secondaryColour,
-                    ), // BorderSide
+                    ),
                   ),
-                  // OutlineInputBorder
                 ),
-                onChanged: (value) async {
-                  setState(() {
-                    input = value;
-                    widget.api = widget.api.replaceAll("{...}", input);
-                    // results = fetchResults(widget.api);
-                    fetchResults(widget.api);
-                  });
-                }, // InputDecoration
+                onSubmitted: (value) async {
+                  if (value != input) {
+                    setState(() {
+                      pageNumber = 1;
+                      resultList = [];
+                      isLastPage = false;
+                      loading = true;
+                      error = false;
+                      input = value;
+                      widget.api = widget.api.replaceAll("{...}", input);
+                      widget.api = widget.api.replaceAll("{*}", pageNumber.toString());
+                      fetchResults(widget.api);
+                    });
+                  }
+                },
               ),
-              // TextField
-            ), // Expanded
+            ),
           ],
-        ), // Row,
+        ),
       ),
-      body: checkResult(resultList),
-      // ListView(
-      //   children: [
-      //     Text(
-      //       "$resultList",
-      //       style: textPrimary,
-      //     ),
-      //   ],
-      // )
-      // Column(children: [
-
-//
+      body: buildResults(),
     );
   }
 
-  Future<String> fetchResults(String api) async {
-    // https://api.themoviedb.org/3/search/movie?language=en-US&query=&page=1&include_adult=false&api_key=21cc517d0bad572120d1663613b3a1a7
-    final response = await http.get(Uri.parse(api));
-    List tempResultList = [];
-    if (response.statusCode == 200) {
-      for (int i = 0; i < json.decode(response.body)['results'].length; i++) {
-        tempResultList.add(json.decode(response.body)['results'][i]);
+  Widget buildResults() {
+    if (resultList.isEmpty) {
+      if (loading) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(8),
+            child: CircularProgressIndicator(),
+          ),
+        );
+      } else if (error) {
+        return Center(child: errorDialog(size: 20));
       }
+    }
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 15, left: 15, bottom: 15),
+            child: Text(
+              "$resultCount results",
+              style: textPrimaryBold18,
+            ),
+          ),
+        ),
+        Expanded(
+          child: GridView.builder(
+            controller: controller,
+            physics: const BouncingScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              childAspectRatio: (12 / 17),
+            ),
+            itemCount: resultList.length + (isLastPage ? 0 : 1),
+            itemBuilder: (context, index) {
+              if (index == resultList.length) {
+                if (error) {
+                  return Center(child: errorDialog(size: 15));
+                } else {
+                  return const Center(
+                      child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: CircularProgressIndicator(),
+                  ));
+                }
+              }
+              final MovieThumb mt = resultList[index];
+              return MovieThumb(
+                movieId: mt.movieId,
+                posterPath: mt.posterPath,
+                rating: mt.rating,
+              );
+            },
+          ),
+        )
+      ],
+    );
+  }
+
+  Future<void> fetchResults(String api) async {
+    // https://api.themoviedb.org/3/search/movie?language=en-US&query=&page=1&include_adult=false&api_key=21cc517d0bad572120d1663613b3a1a7
+    try {
+      final response = await http.get(Uri.parse(api));
+      Map responseList = json.decode(response.body);
+      lastPage = responseList['total_pages'];
+
+      List<MovieThumb> movieThumbList = [];
+      for (int i = 0; i < responseList['results'].length; i++) {
+        movieThumbList.add(MovieThumb(
+            posterPath: responseList['results'][i]['poster_path'].toString(), rating: responseList['results'][i]['vote_average'].toString(), movieId: responseList['results'][i]['id'].toString()));
+      }
+      print("Line 263 api === $api");
       setState(() {
-        // ignore: unused_local_variable
-        var resultsResponse = json.decode(response.body);
-        resultList = tempResultList;
+        isLastPage = movieThumbList.length < 20;
+        loading = false;
+        pageNumber++;
+        resultList.addAll(movieThumbList);
+        resultCount = responseList['total_results'].toString();
       });
-      return response.body;
-    } else {
-      throw Exception('Failed to load reviews');
+    } catch (e) {
+      print("e!!!!!!!! ======= $e");
+      loading = false;
+      error = true;
     }
   }
 
-  Widget checkResult(list) {
-    if (list.length > 0) {
-      return GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          // crossAxisSpacing: 0,
-          // mainAxisSpacing: 0,
-          childAspectRatio: (12 / 17),
-          // childAspectRatio: (MediaQuery.of(context).size.width /
-          //     (MediaQuery.of(context).size.height / 1.47)),
-        ),
-        // itemCount: jsonMapSearch['results'].length,
-        // itemCount: 9,
-        itemCount: resultList.length,
-        // shrinkWrap: true,
-        padding: const EdgeInsets.all(10),
-        scrollDirection: Axis.vertical,
-        itemBuilder: (BuildContext c, int i) {
-          Map resultItem = resultList[i];
-          // return Container(
-          //   decoration: BoxDecoration(
-          //     color: Colors.red,
-          //   ),
-          //   child: Text(
-          //     input,
-          //     style: textPrimary,
-          //   ),
-          // );
-          return MovieThumb(
-            movieId: resultItem['id'].toString(),
-            posterPath: (resultItem['poster_path']).toString(),
-            rating: resultItem['vote_average'].toString(),
-          );
-        },
-        // gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        //   crossAxisCount: 3,
-        // ),
-      );
-    } else {
-      return const Text("No results found");
-    }
+  Widget errorDialog({required double size}) {
+    return SizedBox(
+      height: 180,
+      width: 200,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'An error occurred while retrieving results.',
+            style: TextStyle(fontSize: size, fontWeight: FontWeight.w500, color: Colors.black),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  loading = true;
+                  error = false;
+                  fetchResults(widget.api);
+                });
+              },
+              child: Text(
+                "Retry",
+                style: textSecondaryBold20,
+              )),
+        ],
+      ),
+    );
   }
 }

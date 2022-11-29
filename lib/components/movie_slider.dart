@@ -47,8 +47,7 @@ class _MovieSliderState extends State<MovieSlider> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding:
-                        const EdgeInsets.only(top: 15, left: 15, bottom: 5),
+                    padding: const EdgeInsets.only(top: 15, left: 15, bottom: 5),
                     child: Text(
                       widget.sliderTitle,
                       style: const TextStyle(

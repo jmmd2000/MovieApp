@@ -25,13 +25,13 @@ Widget getMovieImage(path) {
       if (path != "null") {
         return Image.network('https://image.tmdb.org/t/p/w500$path');
       } else {
-        return Image.asset("lib/assets/error.png");
+        return Image.asset("lib/assets/errorBackdrop.png");
       }
     } else {
-      return Image.asset("lib/assets/error.png");
+      return Image.asset("lib/assets/errorBackdrop.png");
     }
   } else {
-    return Image.asset("lib/assets/error.png");
+    return Image.asset("lib/assets/errorBackdrop.png");
   }
 }
 
@@ -47,26 +47,26 @@ Widget getMovieThumbImage(path) {
         );
       } else {
         return Image.asset(
-          "lib/assets/error.png",
+          "lib/assets/errorThumb.png",
           height: 172,
           width: 121,
-          fit: BoxFit.cover,
+          fit: BoxFit.contain,
         );
       }
     } else {
       return Image.asset(
-        "lib/assets/error.png",
+        "lib/assets/errorThumb.png",
         height: 172,
         width: 121,
-        fit: BoxFit.cover,
+        fit: BoxFit.contain,
       );
     }
   } else {
     return Image.asset(
-      "lib/assets/error.png",
+      "lib/assets/errorThumb.png",
       height: 172,
       width: 121,
-      fit: BoxFit.cover,
+      fit: BoxFit.contain,
     );
   }
 }

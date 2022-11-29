@@ -1,15 +1,19 @@
-// ignore: implementation_imports
-import 'dart:convert';
-// import 'dart:html';
+// This component is a page that displays information about a particular movie.
+// It displays the banner image for the movie, along with other information like:
+// • Title                • Tagline             • Overview
+// • Community rating     • List of genres      • Release Date
+// • Runtime              • Budget              • Revenue
+// • Country of Origin
+// Along with a single, random user review in a CommentCard. There is also a button that
+// brings the user to the CommentList page for the movie.
 
+import 'dart:convert';
 import 'package:api/components/functions/round_rating.dart';
 import 'package:api/components/functions/random_number.dart';
 import 'package:api/components/functions/null_check.dart';
 import 'package:flutter/material.dart';
-// ignore: implementation_imports
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:navbar_router/navbar_router.dart';
 import '../colours.dart';
 import 'comment_card.dart';
 import 'comment_list.dart';
@@ -21,11 +25,7 @@ class MoviePage extends StatefulWidget {
   final String api;
   final String reviewsAPI;
   final String movieID;
-  const MoviePage(
-      {super.key,
-      required this.api,
-      required this.reviewsAPI,
-      required this.movieID});
+  const MoviePage({super.key, required this.api, required this.reviewsAPI, required this.movieID});
 
   @override
   State<MoviePage> createState() => _MoviePageState();
@@ -58,10 +58,10 @@ class _MoviePageState extends State<MoviePage> {
             if (snapshot.hasData) {
               Map jsonMap = json.decode(snapshot.data!);
               // This parses the release date value from the API response so it can be displayed in a nicer way
-              DateTime relDate =
-                  DateTime.parse(nullCheck(jsonMap['release_date']));
+              DateTime relDate = DateTime.parse(nullCheck(jsonMap['release_date']));
               // This is from the 'intl' package and parses a number to a nicer format
               final value = NumberFormat("#,###", "en_US");
+              print("Movie ID is: ${jsonMap['id']}");
               return ListView(
                 children: [
                   Column(
@@ -77,8 +77,7 @@ class _MoviePageState extends State<MoviePage> {
                   //     'https://image.tmdb.org/t/p/w500${jsonMap['backdrop_path']}'),
                   // This is the tagline of the movie below the poster
                   Padding(
-                    padding: const EdgeInsets.only(
-                        top: 16, bottom: 0, left: 16, right: 16),
+                    padding: const EdgeInsets.only(top: 16, bottom: 0, left: 16, right: 16),
                     child: Column(children: [
                       Text(
                         // jsonMap['tagline'] ?? "loading...",
@@ -112,9 +111,7 @@ class _MoviePageState extends State<MoviePage> {
                           backgroundColor: secondaryColour,
                           radius: 35,
                           child: Text(
-                            roundRating(
-                                nullCheck(jsonMap['vote_average'].toString()),
-                                count),
+                            roundRating(nullCheck(jsonMap['vote_average'].toString()), count),
                             style: textPrimaryBold28,
                           ),
                         ),
@@ -129,8 +126,7 @@ class _MoviePageState extends State<MoviePage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(
-                        top: 0, bottom: 0, left: 16, right: 16),
+                    padding: const EdgeInsets.only(top: 0, bottom: 0, left: 16, right: 16),
                     child: Column(
                       children: [
                         // Center(
@@ -147,15 +143,13 @@ class _MoviePageState extends State<MoviePage> {
                             itemBuilder: (BuildContext c, int i) {
                               Map genre = jsonMap['genres'][i];
                               return Container(
-                                margin:
-                                    const EdgeInsets.only(left: 0, right: 5.0),
+                                margin: const EdgeInsets.only(left: 0, right: 5.0),
                                 child: Wrap(
                                   // crossAxisAlignment: WrapCrossAlignment.center,
                                   children: [
                                     Chip(
                                       elevation: 20,
-                                      padding: const EdgeInsets.only(
-                                          left: 8, right: 8),
+                                      padding: const EdgeInsets.only(left: 8, right: 8),
                                       backgroundColor: secondaryColour,
                                       shadowColor: Colors.black,
                                       label: Text(
@@ -174,8 +168,7 @@ class _MoviePageState extends State<MoviePage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(
-                        top: 0, bottom: 8, left: 16, right: 16),
+                    padding: const EdgeInsets.only(top: 0, bottom: 8, left: 16, right: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -229,11 +222,21 @@ class _MoviePageState extends State<MoviePage> {
                             style: textSecondary16,
                           ),
                           const Spacer(),
-                          // Text(
-                          //   nullCheck(jsonMap['production_companies'][0]
-                          //       ['origin_country']),
-                          //   style: textPrimary16,
-                          // )
+                          Text(
+                            arrayCheckCountryOrigin(jsonMap['production_companies']),
+                            style: textPrimary16,
+                          )
+                        ]),
+                        Row(children: [
+                          Text(
+                            "ID:",
+                            style: textSecondary16,
+                          ),
+                          const Spacer(),
+                          Text(
+                            jsonMap['id'].toString(),
+                            style: textPrimary16,
+                          )
                         ]),
                       ],
                     ),
@@ -246,8 +249,7 @@ class _MoviePageState extends State<MoviePage> {
                     thickness: 2,
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.only(left: 10, top: 10, bottom: 10),
+                    padding: const EdgeInsets.only(left: 10, top: 10, bottom: 10),
                     child: Text(
                       "User Reviews",
                       style: textPrimaryBold28,
@@ -259,23 +261,16 @@ class _MoviePageState extends State<MoviePage> {
                       if (reviewSnapshot.hasData) {
                         Map jsonMapReviews = json.decode(reviewSnapshot.data!);
                         if (jsonMapReviews['results'].length > 0) {
-                          int ranNum =
-                              randomNumber(0, jsonMapReviews['results'].length);
+                          int ranNum = randomNumber(0, jsonMapReviews['results'].length);
 // This parses the release date value from the API response so it can be displayed in a nicer way
                           return Column(
                             children: [
                               CommentCard(
-                                authorUsername: jsonMapReviews['results']
-                                    [ranNum]['author_details']['username'],
-                                profilePicture: jsonMapReviews['results']
-                                    [ranNum]['author_details']['avatar_path'],
-                                reviewContent: jsonMapReviews['results'][ranNum]
-                                    ['content'],
-                                reviewRating: jsonMapReviews['results'][ranNum]
-                                        ['author_details']['rating']
-                                    .toString(),
-                                reviewDate: jsonMapReviews['results'][ranNum]
-                                    ['created_at'],
+                                authorUsername: jsonMapReviews['results'][ranNum]['author_details']['username'],
+                                profilePicture: jsonMapReviews['results'][ranNum]['author_details']['avatar_path'],
+                                reviewContent: jsonMapReviews['results'][ranNum]['content'],
+                                reviewRating: jsonMapReviews['results'][ranNum]['author_details']['rating'].toString(),
+                                reviewDate: jsonMapReviews['results'][ranNum]['created_at'],
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(18),
@@ -285,15 +280,12 @@ class _MoviePageState extends State<MoviePage> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => CommentList(
-                                                api:
-                                                    'https://api.themoviedb.org/3/movie/${widget.movieID}/reviews?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US',
+                                                api: 'https://api.themoviedb.org/3/movie/${widget.movieID}/reviews?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US&page={*}',
                                               )),
                                     );
                                   },
                                   style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            secondaryColour),
+                                    backgroundColor: MaterialStateProperty.all<Color>(secondaryColour),
                                   ),
                                   child: const Text("See all user reviews"),
                                 ),
@@ -301,10 +293,13 @@ class _MoviePageState extends State<MoviePage> {
                             ],
                           );
                         } else {
-                          return Text(
-                            "No reviews",
-                            style: textPrimaryBold18,
-                            textAlign: TextAlign.center,
+                          return Padding(
+                            padding: const EdgeInsets.all(50),
+                            child: Text(
+                              "No reviews",
+                              style: textPrimaryBold18,
+                              textAlign: TextAlign.center,
+                            ),
                           );
                         }
                       } else if (reviewSnapshot.hasError) {

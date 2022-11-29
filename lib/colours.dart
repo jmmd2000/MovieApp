@@ -14,20 +14,13 @@ TextStyle textPrimary = const TextStyle(color: fontPrimary);
 TextStyle textPrimary12 = const TextStyle(color: fontPrimary, fontSize: 12);
 TextStyle textPrimary14 = const TextStyle(color: fontPrimary, fontSize: 14);
 TextStyle textPrimary16 = const TextStyle(color: fontPrimary, fontSize: 16);
-TextStyle textPrimaryBold18 = const TextStyle(
-    color: fontPrimary, fontSize: 18, fontWeight: FontWeight.bold);
-TextStyle textPrimaryBold28 = const TextStyle(
-    color: fontPrimary, fontSize: 28, fontWeight: FontWeight.bold);
+TextStyle textPrimaryBold18 = const TextStyle(color: fontPrimary, fontSize: 18, fontWeight: FontWeight.bold);
+TextStyle textPrimaryBold28 = const TextStyle(color: fontPrimary, fontSize: 28, fontWeight: FontWeight.bold);
 
 TextStyle textSecondary = const TextStyle(color: secondaryColour);
-TextStyle textSecondaryBold28 = const TextStyle(
-    color: secondaryColour, fontSize: 28, fontWeight: FontWeight.bold);
-TextStyle textSecondaryBold20 = const TextStyle(
-    color: secondaryColour, fontSize: 20, fontWeight: FontWeight.bold);
+TextStyle textSecondaryBold28 = const TextStyle(color: secondaryColour, fontSize: 28, fontWeight: FontWeight.bold);
+TextStyle textSecondaryBold20 = const TextStyle(color: secondaryColour, fontSize: 20, fontWeight: FontWeight.bold);
 
-TextStyle textSecondary12 =
-    const TextStyle(color: secondaryColour, fontSize: 12);
-TextStyle textSecondary14 =
-    const TextStyle(color: secondaryColour, fontSize: 14);
-TextStyle textSecondary16 =
-    const TextStyle(color: secondaryColour, fontSize: 16);
+TextStyle textSecondary12 = const TextStyle(color: secondaryColour, fontSize: 12);
+TextStyle textSecondary14 = const TextStyle(color: secondaryColour, fontSize: 14);
+TextStyle textSecondary16 = const TextStyle(color: secondaryColour, fontSize: 16);

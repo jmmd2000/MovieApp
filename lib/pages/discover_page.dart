@@ -62,8 +62,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => SearchPage(
-                          api:
-                              'https://api.themoviedb.org/3/search/movie?language=en-US&query={...}&page=1&include_adult=false&api_key=21cc517d0bad572120d1663613b3a1a7',
+                          api: 'https://api.themoviedb.org/3/search/movie?language=en-US&query={...}&page={*}&include_adult=false&api_key=21cc517d0bad572120d1663613b3a1a7',
                         )),
               );
             },
@@ -80,18 +79,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
       body: ListView(
         scrollDirection: Axis.vertical,
         children: const [
-          MovieSlider(
-              sliderTitle: "Trending Daily",
-              api:
-                  'https://api.themoviedb.org/3/trending/movie/day?&api_key=21cc517d0bad572120d1663613b3a1a7'),
-          MovieSlider(
-              sliderTitle: "Trending Weekly",
-              api:
-                  'https://api.themoviedb.org/3/trending/movie/week?&api_key=21cc517d0bad572120d1663613b3a1a7'),
-          MovieSlider(
-              sliderTitle: "Upcoming",
-              api:
-                  'https://api.themoviedb.org/3/movie/upcoming?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US&page=1'),
+          MovieSlider(sliderTitle: "Trending Daily", api: 'https://api.themoviedb.org/3/trending/movie/day?&api_key=21cc517d0bad572120d1663613b3a1a7'),
+          MovieSlider(sliderTitle: "Trending Weekly", api: 'https://api.themoviedb.org/3/trending/movie/week?&api_key=21cc517d0bad572120d1663613b3a1a7'),
+          MovieSlider(sliderTitle: "Upcoming", api: 'https://api.themoviedb.org/3/movie/upcoming?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US&page=1'),
         ],
       ),
     );

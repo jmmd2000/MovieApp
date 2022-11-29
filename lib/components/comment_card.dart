@@ -1,3 +1,7 @@
+// This component is a card that displays a users comment about a particular movie.
+// It shows their rating, username, profile picture, comment content and the date and time
+// it was posted.
+
 import 'package:api/colours.dart';
 import 'package:api/components/functions/null_check.dart';
 import 'package:api/components/functions/round_rating.dart';

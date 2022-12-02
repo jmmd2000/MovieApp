@@ -15,9 +15,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import '../colours.dart';
-import 'comment_card.dart';
-import 'comment_list.dart';
-import 'functions/get_image.dart';
+import '../components/comment/comment_card.dart';
+import '../components/comment/comment_list.dart';
+import '../components/functions/get_image.dart';
 
 class MoviePage extends StatefulWidget {
 // class MoviePage extends StatelessWidget {
@@ -61,7 +61,7 @@ class _MoviePageState extends State<MoviePage> {
               DateTime relDate = DateTime.parse(nullCheck(jsonMap['release_date']));
               // This is from the 'intl' package and parses a number to a nicer format
               final value = NumberFormat("#,###", "en_US");
-              print("Movie ID is: ${jsonMap['id']}");
+              // print("Movie ID is: ${jsonMap['id']}");
               return ListView(
                 children: [
                   Column(

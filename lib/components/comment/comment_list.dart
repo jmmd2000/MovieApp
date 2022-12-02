@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 import 'package:api/colours.dart';
-import 'package:api/components/comment_card.dart';
+import 'package:api/components/comment/comment_card.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -33,7 +33,7 @@ class _CommentListState extends State<CommentList> {
   void initState() {
     super.initState();
     pageNumber = 1;
-    print("pageNum1 = $pageNumber");
+    // print("pageNum1 = $pageNumber");
     reviewList = [];
     isLastPage = false;
     loading = true;
@@ -47,9 +47,9 @@ class _CommentListState extends State<CommentList> {
         if (!isTop) {
           setState(() {
             if (pageNumber < lastPage) {
-              print('TRUEEEEE');
+              // print('TRUEEEEE');
               pageNumber++;
-              print("pageNum2 = $pageNumber");
+              // print("pageNum2 = $pageNumber");
               widget.api = apiURL.replaceAll("{*}", pageNumber.toString());
               fetchReviews(widget.api);
             }
@@ -151,7 +151,7 @@ class _CommentListState extends State<CommentList> {
             isLastPage = commentCardList.length < 20;
             loading = false;
             pageNumber++;
-            print("pageNum3 = $pageNumber");
+            // print("pageNum3 = $pageNumber");
             reviewList.addAll(commentCardList);
             resultCount = responseList['total_results'].toString();
           });

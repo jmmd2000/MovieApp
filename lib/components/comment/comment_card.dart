@@ -7,7 +7,7 @@ import 'package:api/components/functions/null_check.dart';
 import 'package:api/components/functions/round_rating.dart';
 import 'package:api/components/functions/remove_markdown.dart';
 import 'package:flutter/material.dart';
-import 'functions/get_image.dart';
+import '../functions/get_image.dart';
 
 class CommentCard extends StatelessWidget {
   final String authorUsername;

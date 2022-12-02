@@ -5,8 +5,8 @@ import 'dart:convert';
 // import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import '../components/movie_thumb.dart';
-import '../colours.dart';
+import 'movie_thumb.dart';
+import '../../colours.dart';
 
 class MovieSlider extends StatefulWidget {
   final String api;

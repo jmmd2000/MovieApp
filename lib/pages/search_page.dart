@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 import 'package:api/colours.dart';
-import 'package:api/components/movie_thumb.dart';
+import 'package:api/components/movie/movie_thumb.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -200,7 +200,7 @@ class _SearchPageState extends State<SearchPage> {
         movieThumbList.add(MovieThumb(
             posterPath: responseList['results'][i]['poster_path'].toString(), rating: responseList['results'][i]['vote_average'].toString(), movieId: responseList['results'][i]['id'].toString()));
       }
-      print("Line 263 api === $api");
+      // print("Line 263 api === $api");
       setState(() {
         isLastPage = movieThumbList.length < 20;
         loading = false;
@@ -209,7 +209,7 @@ class _SearchPageState extends State<SearchPage> {
         resultCount = responseList['total_results'].toString();
       });
     } catch (e) {
-      print("e!!!!!!!! ======= $e");
+      // print("e!!!!!!!! ======= $e");
       loading = false;
       error = true;
     }

@@ -6,10 +6,11 @@
 // import 'dart:html'
 
 // import 'package:api/colours.dart';
-import '../components/movie_slider.dart';
+import '../components/movie/movie_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:api/main.dart';
 
-import '../components/search_page.dart';
+import 'search_page.dart';
 // import 'package:http/http.dart' as http;
 
 // Future<String> fetchMovie() async {
@@ -37,6 +38,7 @@ class DiscoverPage extends StatefulWidget {
 }
 
 class _DiscoverPageState extends State<DiscoverPage> {
+  String greeting = "Welcome";
   // int counter = 0;
 
   // void _incrementCounter() {
@@ -52,9 +54,14 @@ class _DiscoverPageState extends State<DiscoverPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (auth.currentUser != null) {
+      setState(() {
+        greeting = "Welcome ${auth.currentUser!.displayName.toString()}";
+      });
+    }
     return Scaffold(
       appBar: AppBar(
-        title: Text('Discover Page'),
+        title: Text(greeting),
         actions: [
           IconButton(
             onPressed: () {

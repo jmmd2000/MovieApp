@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'movie_page.dart';
-import '../colours.dart';
-import 'functions/round_rating.dart';
-import 'functions/get_image.dart';
+import '../../pages/movie_page.dart';
+import '../../colours.dart';
+import '../functions/round_rating.dart';
+import '../functions/get_image.dart';
 import 'dart:core';
 
 class MovieThumb extends StatefulWidget {

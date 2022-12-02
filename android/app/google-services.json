@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "531639619189",
+    "project_id": "movieapp-b29ae",
+    "storage_bucket": "movieapp-b29ae.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:531639619189:android:4720f90c2f7f215983723c",
+        "android_client_info": {
+          "package_name": "com.rateflix.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "531639619189-6nc3n1kjp9atff7h95e9g9mb64n9evn1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rateflix.app",
+            "certificate_hash": "d9e4ab5a288e53e6db188eb34b1c78253e51265a"
+          }
+        },
+        {
+          "client_id": "531639619189-7c6259af8ban4clksacs6vb6s9oehsvf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2jOIkF6mNk7UCq3N5R24ssrPkuvjWOxI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "531639619189-7c6259af8ban4clksacs6vb6s9oehsvf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "531639619189-ug5k2mcq7lgstgcoq39vav78eo7q0uc2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.api"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

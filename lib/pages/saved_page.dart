@@ -1,7 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:api/components/functions/auth.dart';
 import 'package:flutter/material.dart';
-import '../colours.dart';
+// import '../colours.dart';
+import 'package:api/main.dart';
 
 class SavedPage extends StatefulWidget {
   const SavedPage({super.key});
@@ -11,19 +13,6 @@ class SavedPage extends StatefulWidget {
 }
 
 class _SavedPageState extends State<SavedPage> {
-  int counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,13 +20,27 @@ class _SavedPageState extends State<SavedPage> {
         title: Text('Saved Page'),
       ),
       body: Center(
-          child: Text('Saved $counter',
-              style: TextStyle(fontSize: 60, color: fontPrimary))),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: ElevatedButton(
+          onPressed: () {
+            signOut(context: context, user: auth.currentUser);
+            // if (user != null) {
+            //   setState(() {
+            //     answer = "Goodbye";
+            //   });
+            // } else {
+            //   setState(() {
+            //     answer = "error";
+            //   });
+            // }
+          },
+          child: const Text("Log out"),
+        ),
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _incrementCounter,
+      //   tooltip: 'Increment',
+      //   child: Icon(Icons.add),
+      // ),
     );
   }
 }

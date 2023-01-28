@@ -8,6 +8,7 @@
 // brings the user to the CommentList page for the movie.
 
 import 'dart:convert';
+import 'package:api/components/functions/global.dart';
 import 'package:api/components/functions/round_rating.dart';
 import 'package:api/components/functions/random_number.dart';
 import 'package:api/components/functions/null_check.dart';
@@ -17,7 +18,10 @@ import 'package:intl/intl.dart';
 import '../colours.dart';
 import '../components/comment/comment_card.dart';
 import '../components/comment/comment_list.dart';
+import '../components/functions/db.dart';
 import '../components/functions/get_image.dart';
+import 'package:api/components/fab.dart';
+import 'saved_page.dart';
 
 class MoviePage extends StatefulWidget {
 // class MoviePage extends StatelessWidget {
@@ -25,7 +29,8 @@ class MoviePage extends StatefulWidget {
   final String api;
   final String reviewsAPI;
   final String movieID;
-  const MoviePage({super.key, required this.api, required this.reviewsAPI, required this.movieID});
+  final String posterPath;
+  const MoviePage({super.key, required this.api, required this.reviewsAPI, required this.movieID, required this.posterPath});
 
   @override
   State<MoviePage> createState() => _MoviePageState();
@@ -337,6 +342,17 @@ class _MoviePageState extends State<MoviePage> {
           },
         ),
       ),
+      floatingActionButton: FabMenu(
+        movieID: widget.movieID,
+        posterPath: widget.posterPath,
+        watchList: resultList,
+        // key: UniqueKey(),
+      ),
+      // FloatingActionButton.large(
+      //   onPressed: (() => addUser(userRef)),
+      //   tooltip: 'Save',
+      //   child: const Icon(Icons.favorite),
+      // ),
     );
   }
 

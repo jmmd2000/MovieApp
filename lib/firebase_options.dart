@@ -57,6 +57,7 @@ class DefaultFirebaseOptions {
     appId: '1:531639619189:android:4720f90c2f7f215983723c',
     messagingSenderId: '531639619189',
     projectId: 'movieapp-b29ae',
+    databaseURL: 'https://movieapp-b29ae-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'movieapp-b29ae.appspot.com',
   );
 }

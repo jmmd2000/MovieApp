@@ -27,7 +27,7 @@ class _SearchPageState extends State<SearchPage> {
   late int lastPage;
   late String resultCount = "0";
   String apiURL = "";
-  String input = "dasfjhsihfbsfbsioyhubdvf";
+  String input = "";
   final controller = ScrollController();
 
   @override
@@ -129,7 +129,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget buildResults() {
+  Widget? buildResults() {
     if (resultList.isEmpty) {
       if (loading) {
         return const Center(

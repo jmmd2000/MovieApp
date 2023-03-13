@@ -1,9 +1,10 @@
+// This is the login screen. It contains a welcome message and
+// a "Sign in with Google" button
+
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
-import '../components/functions/auth.dart';
-import 'package:api/main.dart';
-import '../colours.dart';
-// import '../firebaseInit.dart';
+import 'package:api/components/functions/auth.dart';
+import 'package:api/colours.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -25,10 +26,6 @@ class _LoginPageState extends State<LoginPage> {
         scaffoldBackgroundColor: white,
       ),
       home: Scaffold(
-        // appBar: AppBar(
-        //   title: const Text('Welcome to RateFlix!'),
-        //   centerTitle: true,
-        // ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -52,15 +49,9 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () async {
                       await signInWithGoogle(auth);
                       if (mounted) {
-                        // print("mounted, checking login___________");
                         loginCheck(auth, context);
                       }
                     },
-                  ),
-                  SignInButtonBuilder(
-                    backgroundColor: secondaryColour,
-                    onPressed: () {},
-                    text: 'Sign in as guest',
                   ),
                 ],
               ),

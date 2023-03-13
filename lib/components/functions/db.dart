@@ -1,29 +1,21 @@
-// ignore_for_file: avoid_print
+// This code contains functions that perform various operations on the
+// Firebase database:
+// Store user details
+// Add to, delete from, and fetch the user watchlist
+// Add to, delete from, update and fetch the user ratings
 
-import 'dart:convert';
-
+import 'package:api/components/functions/check_if_rated.dart';
+import 'package:api/components/functions/movie.dart';
 import 'package:api/components/movie/movie_thumb.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'auth.dart';
-import 'global.dart';
 
-// FirebaseDatabase database = FirebaseDatabase.instance;
-// // DatabaseReference initalRef = FirebaseDatabase.instance.ref("users");
-// // DatabaseReference userRef = FirebaseDatabase.instance.ref("users/123");
-// String currentUserID = auth.currentUser!.uid;
-// DatabaseReference userRef = FirebaseDatabase.instance.ref("users");
-
-// DatabaseReference watchlistRef = FirebaseDatabase.instance.ref("watchlist/${auth.currentUser!.uid}");
-
-// List<String?> keyList = [];
+import 'package:api/main.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
 
 void storeUser() {
-  print("(db.dart)(storeUser) Called");
   var user = <String, dynamic>{
     "name": auth.currentUser!.displayName,
     "image": auth.currentUser!.photoURL,
@@ -31,190 +23,168 @@ void storeUser() {
   };
 
   try {
-    db.collection("users").add(user).then((DocumentReference doc) => print('DocumentSnapshot added with ID: ${doc.id}'));
+    db.collection("users").add(user).then((DocumentReference doc) => {});
   } catch (error) {
-    print("(db.dart)(storeUser) $error");
-  } finally {
-    print('(db.dart)(storeUser) Done writing to database');
-  }
+  } finally {}
 }
 
-bool deleteFromWatchlist(movieID) {
-  print("(db.dart)(deleteFromWatchlist) Called");
-
+Future<bool> deleteFromWatchlist(id) async {
   try {
-    var entry = db.collection('watchlist').where('movieID', isEqualTo: movieID);
+    var entry = db.collection('watchlist').where('id', isEqualTo: id);
     entry.get().then((querySnapshot) {
       querySnapshot.docs.forEach((doc) {
         doc.reference.delete();
       });
     });
   } catch (error) {
-    print("(db.dart)(deleteFromWatchlist) $error");
     return false;
   } finally {
-    print('(db.dart)(deleteFromWatchlist) Done deleting from database');
+    watchList.removeWhere((movieThumb) => movieThumb.movie.id == id);
+    watchList = await fetchWatchlist();
+
     return true;
   }
 }
 
-bool addtoWatchlist(posterPath, movieID) {
-  print("(db.dart)(addtoWatchlist) Called");
-  var movie = <String, dynamic>{
+Future<bool> addtoWatchlist(Movie movie) async {
+  var m = <String, dynamic>{
     "uid": auth.currentUser!.uid,
-    "posterPath": posterPath,
-    "movieID": movieID,
+    "posterPath": movie.posterPath,
+    "adult": movie.adult,
+    "overview": movie.overview,
+    "releaseDate": movie.releaseDate,
+    "genres": movie.genreIDs,
+    "id": movie.id,
+    "title": movie.title,
+    "backdropPath": movie.backdropPath,
+    "voteCount": movie.voteCount,
+    "voteAverage": movie.voteAverage,
   };
 
   try {
-    db.collection("watchlist").add(movie).then((DocumentReference doc) => print('(db.dart)(addtoWatchlist) DocumentSnapshot added with ID: ${doc.id}'));
+    db.collection("watchlist").add(m).then((DocumentReference doc) => {});
   } catch (error) {
-    print("(db.dart)(addtoWatchlist) $error");
     return false;
   } finally {
-    print('(db.dart)(addtoWatchlist) Done writing to database');
+    watchList.add(MovieThumb(movie: movie));
+    watchList = await fetchWatchlist();
     return true;
   }
-
-  // await db.collection("watchlist").get().then((event) {
-  //   for (var doc in event.docs) {
-  //     print("${doc.id} => ${doc.data()}");
-  //   }
-  // });
 }
 
-List<MovieThumb> fetchWatchlist() {
-  print("(db.dart)(fetchWatchlist) FetchedWL");
+Future<List<MovieThumb>> fetchWatchlist() async {
   QuerySnapshot snapshot;
   List<MovieThumb> watchlist = [];
-  print("(db.dart)(fetchWatchlist)1 watchlist.length = ${watchlist.length}");
-  db.collection("watchlist").where("uid", isEqualTo: auth.currentUser!.uid).get().then(
-    (snapshot) {
-      if (snapshot.size < 1) {
-        print("(db.dart)(fetchWatchlist) No Matching Documents Retrieved");
-      } else {
-        snapshot.docs.forEach((doc) {
-          watchlist.add(MovieThumb(posterPath: doc['posterPath'], rating: "0", movieId: doc['movieID']));
-          print("(db.dart)(fetchWatchlist)2 watchlist.length = ${watchlist.length}");
-          print("(db.dart)(fetchWatchlist) snapshot.length = ${snapshot.docs.length}");
-          print("(db.dart)(fetchWatchlist)1 MovieThumb: posterPath: ${doc['posterPath']}, uid: ${doc['uid']}, movieID: ${doc['movieID']}");
-          watchlist.forEach((element) {
-            print("(db.dart)(fetchWatchlist)2 MovieThumb: posterPath: ${element.posterPath}, uid: ${element.rating}, movieID: ${element.movieId}");
-          });
-        });
-        return watchlist;
-      }
-    },
-    onError: (e) => print("(db.dart)(fetchWatchlist) Error completing: $e"),
-  );
-  print("(db.dart)(fetchWatchlist) -----WL-----");
-  print("(db.dart)(fetchWatchlist)3 watchlist.length = ${watchlist.length}");
-  watchlist.forEach((element) {
-    print("(db.dart)(fetchWatchlist)3 MovieThumb: posterPath: ${element.posterPath}, uid: ${element.rating}, movieID: ${element.movieId}");
-  });
+
+  db.collection("watchlist").where("uid", isEqualTo: auth.currentUser!.uid).get().then((snapshot) {
+    if (snapshot.size < 1) {
+    } else {
+      snapshot.docs.forEach((doc) {
+        String s = checkIfRated(doc['id'].toString(), ratingsList);
+        Movie m = Movie(doc['posterPath'], doc['adult'], doc['overview'], doc['releaseDate'], doc['genres'].cast<int>(), doc['id'], doc['title'], doc['backdropPath'], doc['voteCount'],
+            doc['voteAverage'].toString(), s);
+        watchlist.add(MovieThumb(
+          movie: m,
+        ));
+      });
+    }
+  }, onError: (e) => {});
+
   return watchlist;
 }
 
-// Future<void> setUserInfo(ref) async {
-//   // print(auth);
+Future<bool> addtoRatings(movie, userRating, Function onSwap) async {
+  var m = <String, dynamic>{
+    "uid": auth.currentUser!.uid,
+    "rating": userRating,
+    "posterPath": movie.posterPath,
+    "adult": movie.adult,
+    "overview": movie.overview,
+    "releaseDate": movie.releaseDate,
+    "genres": movie.genreIDs,
+    "id": movie.id,
+    "title": movie.title,
+    "backdropPath": movie.backdropPath,
+    "voteCount": movie.voteCount,
+    "voteAverage": movie.voteAverage,
+  };
 
-//   print('Start writing to database');
-//   try {
-//     await ref.set({
-//       "name": auth.currentUser!.displayName,
-//       "image": auth.currentUser!.photoURL,
-//       "uid": auth.currentUser!.uid,
-//     });
-//     // await ref.child('title').set('Hello World');
-//   } catch (error) {
-//     print(error);
-//   } finally {
-//     print('Done writing to database');
-//     DatabaseEvent event = await ref.once();
-//     print(event.snapshot.value);
-//   }
-// }
+  try {
+    db.collection("ratings").add(m).then((DocumentReference doc) {});
+  } catch (error) {
+    return false;
+  }
 
-// addUser(ref) {
-//   DatabaseReference newUser = userRef.push();
-//   print('Start writing to database');
-//   try {
-//     // await
-//     newUser.set({
-//       "name": auth.currentUser!.displayName,
-//       "image": auth.currentUser!.photoURL,
-//       "uid": auth.currentUser!.uid,
-//     });
-//     // await ref.child('title').set('Hello World');
-//   } catch (error) {
-//     print(error);
-//   } finally {
-//     print('Done writing to database');
-//     // DatabaseEvent event = await ref.once();
-//     // print(event.snapshot.value);
-//   }
-// }
+  ratingsList = await fetchRatings();
 
-// Future<Map?> fetchWatchlist() async {
-//   print('started');
-//   DatabaseEvent event = await watchlistRef.once();
-//   // print(auth.currentUser!.uid);
+  return true;
+}
 
-// // Subscribe to the stream!
-//   // stream.listen((DatabaseEvent event) {
-//   // print('Event Type: ${event.type}'); // DatabaseEventType.value;
-//   // print('Snapshot: ${event.snapshot.value}'); // DataSnapshot
-//   // if (event.snapshot != null) {
-//   Map? map = event.snapshot.value as Map?;
-//   // Map map2 = {};
-//   // map?.forEach((key, value) {
-//   keyList.clear();
-//   for (DataSnapshot child in event.snapshot.children) {
-//     keyList.add(child.key);
-//     // print("movieid = ${map?[child.key]["movieID"]}");
-//     // map2 = event.snapshot.children as Map;
-//   }
+Future<bool> updateRatings(movie, userRating) async {
+  try {
+    var docRef = db.collection("ratings").where("id", isEqualTo: movie.id).get().then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        doc.reference.update({"rating": userRating});
+      });
+    });
+  } catch (error) {
+    return false;
+  }
 
-//   // print(event.snapshot.children);
+  ratingsList = await fetchRatings();
+  return true;
+}
 
-//   // map?.forEach((key, value) {
-//   //   print('$key \t $value');
-//   // });
+Future<bool> deleteFromRatings(id) async {
+  try {
+    var entry = db.collection('ratings').where('id', isEqualTo: id);
+    entry.get().then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        doc.reference.delete();
+      });
+    });
+  } catch (error) {
+    return false;
+  } finally {
+    ratingsList.removeWhere((element) => element.movie.id == id);
+    ratingsList = await fetchRatings();
 
-//   // for (String item in watchlist) {
-//   //   print(item);
-//   // }
+    return true;
+  }
+}
 
-//   // print(event.snapshot.key);
-//   // } else {
-//   // print("Nothing saved");
-//   // }
-//   // String x = "hello";
-//   // for map.forEach()
-//   // print(map?["-NMfAzwU5tNv0Do4AlY5"]["movieID"]);
-//   // }
-//   // });
-//   return map;
-// }
+Future<List<MovieThumb>> fetchRatings() async {
+  QuerySnapshot snapshot;
+  List<MovieThumb> ratings = [];
 
-// Future<List> fetchKeys() async {
-//   print("keys being fetched");
-//   DatabaseEvent event = await watchlistRef.once();
-//   List keyList = [];
-//   for (DataSnapshot child in event.snapshot.children) {
-//     keyList.add(child.key);
-//   }
-//   return keyList;
-// }
+  db.collection("ratings").where("uid", isEqualTo: auth.currentUser!.uid).get().then((snapshot) {
+    if (snapshot.size < 1) {
+    } else {
+      snapshot.docs.forEach((doc) {
+        var d = doc.data();
+        Movie m = Movie(
+          d['posterPath'],
+          d['adult'],
+          d['overview'],
+          d['releaseDate'],
+          d['genres'].cast<int>(),
+          d['id'],
+          d['title'],
+          d['backdropPath'],
+          d['voteCount'],
+          d['voteAverage'].toString(),
+          d['rating'].toString(),
+        );
+        ratings.add(MovieThumb(
+          movie: m,
+        ));
 
-// addtoWatchlist(posterPath, movieID) async {
-//   String user = auth.currentUser!.uid;
-//   DatabaseReference watchlistRef = FirebaseDatabase.instance.ref("watchlist/$user");
-//   DatabaseReference newWatchlist = watchlistRef.push();
-//   // DatabaseReference watchlistRef = FirebaseDatabase.instance.ref("watchlist/${auth.currentUser!.uid}");
-//   await newWatchlist.update({
-//     "posterPath": posterPath,
-//     "movieID": movieID,
-//     "uid": auth.currentUser!.uid,
-//   });
-// }
+        ratings.forEach((element) {});
+      });
+      return ratings;
+    }
+  }, onError: (e) => {});
+
+  ratings.forEach((element) {});
+  return ratings;
+}

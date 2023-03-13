@@ -6,48 +6,51 @@ import 'package:api/colours.dart';
 import 'package:api/components/functions/null_check.dart';
 import 'package:api/components/functions/round_rating.dart';
 import 'package:api/components/functions/remove_markdown.dart';
+import 'package:api/pages/comment_page.dart';
 import 'package:flutter/material.dart';
-import '../functions/get_image.dart';
+import 'package:api/components/functions/get_image.dart';
 
 class CommentCard extends StatelessWidget {
   final String authorUsername;
   final String? profilePicture;
   final String reviewContent;
   final String reviewRating;
-  final String reviewDate;
+  final bool fullContent;
   const CommentCard({
     super.key,
     required this.authorUsername,
     required this.profilePicture,
     required this.reviewContent,
     required this.reviewRating,
-    required this.reviewDate,
+    required this.fullContent,
   });
 
   @override
   Widget build(BuildContext context) {
-    int count = 0;
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Container(
-        // color: secondaryColour,
-        decoration: BoxDecoration(
-          border: Border.all(color: secondaryColour),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CommentPage(
+              authorUsername: authorUsername,
+              profilePicture: profilePicture,
+              reviewContent: reviewContent,
+              reviewRating: reviewRating,
+            ),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 22),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              decoration: const BoxDecoration(
-                color: secondaryColour,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(9),
-                  topRight: Radius.circular(9),
-                ),
-              ),
-              child: Row(children: [
+            Column(
+              children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 12, top: 6, bottom: 6),
+                  padding: const EdgeInsets.all(8.0),
                   child: CircleAvatar(
                     backgroundImage: getImage(profilePicture),
                     backgroundColor: secondaryColour,
@@ -55,85 +58,85 @@ class CommentCard extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Text(
-                    nullCheck(authorUsername),
-                    style: textPrimaryBold18,
-                  ),
-                ),
-                const Spacer(),
-                Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(8.0),
                   child: CircleAvatar(
-                    backgroundColor: bodyBackground,
-                    radius: 20,
+                    backgroundColor: secondaryColour,
+                    radius: 25,
                     child: Text(
-                      roundRating(nullCheck(reviewRating), count),
-                      style: textSecondaryBold20,
+                      checkRating(reviewRating),
+                      style: textPrimaryBold22,
                     ),
                   ),
-                )
-              ]),
+                ),
+              ],
             ),
-            Container(
-              // height: 200,
-              decoration: const BoxDecoration(
-                color: softWhite,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: ListView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Text(
-                      nullCheck(removeMarkdown(reviewContent)),
-                      style: const TextStyle(height: 1.3),
-                      overflow: TextOverflow.fade,
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        nullCheck(authorUsername) ? authorUsername : "Error retrieving username.",
+                        style: textPrimaryBold18,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ),
-            Container(
-                width: double.infinity,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  color: secondaryColour,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(9),
-                    bottomRight: Radius.circular(9),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: secondaryColour),
+                      bottom: BorderSide(color: secondaryColour),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: fullContent ? fullSize() : limitedSize(),
+                      ),
+                    ],
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(6),
-                  child: Text(
-                    reviewDateImprover(reviewDate),
-                    style: textPrimary,
-                  ),
-                ))
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 
-  String reviewDateImprover(date) {
-    DateTime parsed = DateTime.parse(date);
-    String improved = "${parsed.day}/${parsed.month}/${parsed.year}";
-
-    if (parsed.hour < 10) {
-      improved += " 0${parsed.hour}:";
+  checkRating(rating) {
+    if (rating.toString() == "null") {
+      return "N/A";
     } else {
-      improved += " ${parsed.hour}:";
+      return roundRating(double.parse(rating));
     }
+  }
 
-    if (parsed.minute < 10) {
-      improved += "0${parsed.minute}";
-    } else {
-      improved += "${parsed.minute}";
-    }
+  Widget limitedSize() {
+    return SizedBox(
+      height: 200,
+      width: 300,
+      child: Text(
+        nullCheck(removeMarkdown(reviewContent)) ? removeMarkdown(reviewContent) : "Error retrieving review content.",
+        overflow: TextOverflow.fade,
+        style: textPrimary12,
+      ),
+    );
+  }
 
-    return improved;
+  Widget fullSize() {
+    return SizedBox(
+      width: 300,
+      child: Text(
+        nullCheck(removeMarkdown(reviewContent)) ? removeMarkdown(reviewContent) : "Error retrieving review content.",
+        overflow: TextOverflow.fade,
+        style: textPrimary12,
+      ),
+    );
   }
 }

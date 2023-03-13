@@ -1,29 +1,26 @@
-// ignore_for_file: avoid_print
+// This is the floating access button on the MoviePages. It contains
+// the buttons to add to watchlist and add rating.
 
+import 'package:api/components/add_ratings_button.dart';
 import 'package:api/components/add_watchlist_button.dart';
-import 'package:api/components/functions/db.dart';
+import 'package:api/components/manage_ratings_button.dart';
 import 'package:api/components/movie/movie_thumb.dart';
 import 'package:api/components/remove_watchlist_button.dart';
-import '/components/functions/global.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:navbar_router/navbar_router.dart';
 import 'package:api/colours.dart';
-import '../pages/saved_page.dart';
+import 'functions/movie.dart';
 
 class FabMenu extends StatefulWidget {
-  // final Function() onPressed;
-  final String movieID;
-  final String posterPath;
+  final Movie movie;
 
   final List<MovieThumb> watchList;
-  // final IconData icon;
+  final List<MovieThumb> ratingsList;
 
   const FabMenu({
     super.key,
-    required this.movieID,
-    required this.posterPath,
     required this.watchList,
+    required this.ratingsList,
+    required this.movie,
   });
 
   @override
@@ -31,6 +28,8 @@ class FabMenu extends StatefulWidget {
 }
 
 class FabMenuState extends State<FabMenu> with SingleTickerProviderStateMixin {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController textController = TextEditingController();
   bool isOpened = false;
   late AnimationController animationController;
   late Animation<Color?> buttonColor;
@@ -39,14 +38,14 @@ class FabMenuState extends State<FabMenu> with SingleTickerProviderStateMixin {
   final Curve curve = Curves.easeOut;
   final double fabHeight = 56.0;
   late Widget watchlistButton = Widget as Widget;
-  // late bool showingAddWatchlistButton = checkIfAdded(widget.watchList, widget.movieID);
   bool showingAddWatchlistButton = false;
+  bool showingAddRatingsButton = false;
+  String rating = "";
 
   @override
   initState() {
-    showingAddWatchlistButton = !checkIfAdded(widget.watchList, widget.movieID);
-
-    print(showingAddWatchlistButton);
+    showingAddWatchlistButton = !checkIfAdded(widget.watchList, widget.movie.id);
+    showingAddRatingsButton = !checkIfAdded(widget.ratingsList, widget.movie.id);
 
     animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 500))
       ..addListener(() {
@@ -54,7 +53,6 @@ class FabMenuState extends State<FabMenu> with SingleTickerProviderStateMixin {
       });
     animateIcon = Tween<double>(begin: 0.0, end: 1.0).animate(animationController);
     buttonColor = ColorTween(
-      // begin: Colors.blue,
       begin: secondaryColour,
       end: Colors.red,
     ).animate(CurvedAnimation(
@@ -77,13 +75,13 @@ class FabMenuState extends State<FabMenu> with SingleTickerProviderStateMixin {
       ),
     ));
 
-    // watchlistButton = watchlistButtonToggle(widget.watchList, widget.movieID, widget.posterPath);
     super.initState();
   }
 
   @override
   dispose() {
     animationController.dispose();
+    textController.dispose();
     super.dispose();
   }
 
@@ -94,21 +92,6 @@ class FabMenuState extends State<FabMenu> with SingleTickerProviderStateMixin {
       animationController.reverse();
     }
     isOpened = !isOpened;
-  }
-
-  // Widget watchlistButtonToggle(watchList, movieID, posterPath) {
-  //   bool alreadyAdded = checkIfAdded(watchList, movieID);
-  //   if (alreadyAdded) {
-  //   } else {}
-  // }
-
-  Widget rate() {
-    return FloatingActionButton(
-      onPressed: (() => null),
-      tooltip: 'Rate Movie',
-      heroTag: "RateButton",
-      child: Icon(Icons.thumbs_up_down),
-    );
   }
 
   Widget toggle() {
@@ -126,8 +109,13 @@ class FabMenuState extends State<FabMenu> with SingleTickerProviderStateMixin {
 
   toggleWatchlist() {
     setState(() {
-      // toggle the original widget state
       showingAddWatchlistButton = !showingAddWatchlistButton;
+    });
+  }
+
+  toggleRatings() {
+    setState(() {
+      showingAddRatingsButton = !showingAddRatingsButton;
     });
   }
 
@@ -144,14 +132,12 @@ class FabMenuState extends State<FabMenu> with SingleTickerProviderStateMixin {
           ),
           child: showingAddWatchlistButton
               ? AddWatchlistButton(
-                  movieID: widget.movieID,
+                  movie: widget.movie,
                   onSwap: toggleWatchlist,
-                  posterPath: widget.posterPath,
                 )
               : RemoveWatchlistButton(
-                  movieID: widget.movieID,
+                  movie: widget.movie,
                   onSwap: toggleWatchlist,
-                  posterPath: widget.posterPath,
                 ),
         ),
         Transform(
@@ -160,36 +146,39 @@ class FabMenuState extends State<FabMenu> with SingleTickerProviderStateMixin {
             translateButton.value,
             0.0,
           ),
-          child: rate(),
+          child: showingAddRatingsButton
+              ? AddRatingsButton(
+                  movie: widget.movie,
+                  onSwap: toggleRatings,
+                  cntxt: context,
+                )
+              : ManageRatingsButton(
+                  movie: widget.movie,
+                  onSwap: toggleRatings,
+                  cntxt: context,
+                ),
         ),
         toggle(),
       ],
     );
   }
-}
 
-bool checkIfAdded(list, id) {
-  print("check if added called");
-  for (int i = 0; i < list.length; i++) {
-    print("i = ${list[i].toString()}");
-  }
+  bool checkIfAdded(list, id) {
+    for (int i = 0; i < list.length; i++) {}
 
-  print(id);
+    bool alreadyAdded = false;
 
-  bool alreadyAdded = false;
+    if (list.length == 0) {
+      alreadyAdded = false;
+      return alreadyAdded;
+    }
 
-  if (list.length == 0) {
-    alreadyAdded = false;
+    list.forEach((element) {
+      if (element.movie.id == id) {
+        alreadyAdded = true;
+      }
+    });
+
     return alreadyAdded;
   }
-
-  print("fab watchList.length= ${list.length}");
-  list.forEach((element) {
-    print("fab watchList.element= ${element.movieId}");
-    if (element.movieId == id) {
-      alreadyAdded = true;
-    }
-  });
-
-  return alreadyAdded;
 }

@@ -1,23 +1,19 @@
-String nullCheck(string) {
+// This code checks if a string is null
+bool nullCheck(string) {
   string = string.toString();
-  // print("The string is = " + string);
   if (string == "null") {
-    return "N/A";
+    return false;
   } else if (string.length == 0) {
-    // print("3string = " + string);
-    return "N/A";
+    return false;
   } else if (string == null) {
-    // print("2string = " + string);
-    return "N/A";
+    return false;
   } else {
-    // print("1string = " + string);
-    return string;
+    return true;
   }
 }
 
 // This function is specifically for checking if the 'production_companies' array is empty
 String arrayCheckCountryOrigin(array) {
-  // print(array);
   if (array.length != 0) {
     String temp = array[0]['origin_country'];
     if (temp == "null") {

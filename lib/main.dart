@@ -1,30 +1,42 @@
-// import 'package:api/home.dart';
-import 'package:api/home.dart';
+// This is the root of the app and performs the apps setup
+
 import 'package:api/pages/discover_page.dart';
 import 'package:api/pages/login_page.dart';
-// import 'package:api/pages/saved_page.dart';
-// import 'package:api/pages/discover_page.dart';
+import 'package:api/pages/ratings_page.dart';
+import 'package:api/pages/saved_page.dart';
+import 'package:api/pages/search_page.dart';
+import 'package:api/pages/showtimes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-// import 'colours.dart';
 import 'colours.dart';
+import 'components/movie/movie_thumb.dart';
 import 'firebase_options.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'components/functions/db.dart';
-import 'components/functions/auth.dart';
+
+List<MovieThumb> watchList = [];
+List<MovieThumb> ratingsList = [];
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     name: "RateFlix",
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // runApp(const App());
+
   runApp(
     MaterialApp(
       home: const App(),
       title: 'RateFlix',
+      routes: {
+        'Discover': (context) => const DiscoverPage(),
+        'Login': (context) => const LoginPage(),
+        'Ratings': (context) => const RatingPage(),
+        'Watchlist': (context) => const SavedPage(),
+        'Search': (context) => SearchPage(),
+        'Showtimes': (context) => const ShowtimePage(),
+      },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch().copyWith(
           primary: primaryColour,
@@ -32,6 +44,12 @@ void main() async {
         ),
         scaffoldBackgroundColor: bodyBackground,
         canvasColor: primaryColour,
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(backgroundColor: secondaryColour),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(backgroundColor: secondaryColour),
+        ),
       ),
     ),
   );
@@ -46,34 +64,17 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FirebaseAuth.instance.currentUser != null ? const DiscoverPage() : const LoginPage();
-    // return const MaterialApp(
-    //   title: 'RateFlix',
-    //   // theme: ThemeData(
-    //   //   primarySwatch: Colors.blue,
-    //   // ),
-    //   // home: LoginPage(),
-    //   home: HomePage(),
-    // );
   }
-  // @override
-  // Widget build(BuildContext context) {
-  //   return FutureBuilder<User>(
-  //       future: auth.currentUser,
-  //       builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
-  //         if (snapshot.hasData) {
-  //           User? user = snapshot.data; // this is your user instance
-  //           /// is because there is user already logged
-  //           return const HomePage();
-  //         }
-
-  //         /// other way there is no user logged.
-  //         return const LoginPage();
-  //       });
-  // }
 }
 
-// DISCOVER PAGE
-
-
+appSetup() async {
+  ratingsList = await fetchRatings();
+  watchList = await fetchWatchlist();
+}

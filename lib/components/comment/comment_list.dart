@@ -1,6 +1,5 @@
 // This component is a page that takes all the comments for a given movie and
-// lists them in CommentCards. As the user scrolls to the bottom of the page,
-// it loads the next page of comments and displays them.
+// lists them in CommentCards.
 
 import 'dart:convert';
 import 'package:api/colours.dart';
@@ -8,55 +7,21 @@ import 'package:api/components/comment/comment_card.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-// ignore: must_be_immutable
 class CommentList extends StatefulWidget {
-  String api;
-  CommentList({super.key, required this.api});
+  int? id;
+  CommentList({super.key, required this.id});
 
   @override
   State<CommentList> createState() => _CommentListState();
 }
 
 class _CommentListState extends State<CommentList> {
-  late bool isLastPage;
-  late int pageNumber;
-  late bool error;
-  late bool loading;
-  late List<CommentCard> reviewList;
-  final int nextPageTrigger = 1;
-  late int lastPage;
-  late String resultCount = "0";
-  String apiURL = "";
-  final controller = ScrollController();
+  late Future<String> futureReviews;
 
   @override
   void initState() {
+    futureReviews = fetchReviews(widget.id);
     super.initState();
-    pageNumber = 1;
-    // print("pageNum1 = $pageNumber");
-    reviewList = [];
-    isLastPage = false;
-    loading = true;
-    error = false;
-    apiURL = widget.api;
-    // results = fetchReviews(widget.api);
-    // Setup the listener.
-    controller.addListener(() {
-      if (controller.position.atEdge) {
-        bool isTop = controller.position.pixels == 0;
-        if (!isTop) {
-          setState(() {
-            if (pageNumber < lastPage) {
-              // print('TRUEEEEE');
-              pageNumber++;
-              // print("pageNum2 = $pageNumber");
-              widget.api = apiURL.replaceAll("{*}", pageNumber.toString());
-              fetchReviews(widget.api);
-            }
-          });
-        }
-      }
-    });
   }
 
   @override
@@ -71,95 +36,51 @@ class _CommentListState extends State<CommentList> {
         ),
         title: const Text("Reviews"),
       ),
-      body: buildReviewList(),
-    );
-  }
+      body: FutureBuilder<String>(
+        future: futureReviews,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            Map reviewDetails = json.decode(snapshot.data!);
 
-  Widget buildReviewList() {
-    widget.api = apiURL.replaceAll("{*}", pageNumber.toString());
-    fetchReviews(widget.api);
-    if (reviewList.isEmpty) {
-      if (loading) {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(8),
-            child: CircularProgressIndicator(),
-          ),
-        );
-      } else if (error) {
-        return Center(child: errorDialog(size: 20));
-      }
-    }
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 15, left: 15, bottom: 15),
-            child: Text(
-              "$resultCount reviews",
-              style: textPrimaryBold18,
+            return Container(
+                child: ListView.builder(
+              itemCount: reviewDetails['results'].length,
+              itemBuilder: (BuildContext c, int i) {
+                Map resultItem = reviewDetails['results'][i]!;
+                return CommentCard(
+                  authorUsername: resultItem['author_details']['username'],
+                  profilePicture: resultItem['author_details']['avatar_path'],
+                  reviewContent: resultItem['content'],
+                  reviewRating: resultItem['author_details']['rating'].toString(),
+                  fullContent: false,
+                );
+              },
+            ));
+          } else if (snapshot.hasError) {
+            return Text('${snapshot.error}');
+          }
+
+          // By default, show a loading spinner.
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.all(40),
+              child: CircularProgressIndicator(
+                color: secondaryDarker,
+                backgroundColor: secondaryColour,
+              ),
             ),
-          ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            controller: controller,
-            physics: const BouncingScrollPhysics(),
-            itemCount: reviewList.length + (isLastPage ? 0 : 1),
-            itemBuilder: (context, index) {
-              if (index == reviewList.length) {
-                if (error) {
-                  return Center(child: errorDialog(size: 15));
-                } else {
-                  return const Center(
-                      child: Padding(
-                    padding: EdgeInsets.all(8),
-                    child: CircularProgressIndicator(),
-                  ));
-                }
-              }
-              final CommentCard cc = reviewList[index];
-              return CommentCard(authorUsername: cc.authorUsername, profilePicture: cc.profilePicture, reviewContent: cc.reviewContent, reviewRating: cc.reviewRating, reviewDate: cc.reviewDate);
-            },
-          ),
-        )
-      ],
+          );
+        },
+      ),
     );
   }
 
-  Future<void> fetchReviews(String api) async {
-    // https://api.themoviedb.org/3/movie/{movie_id}/reviews?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US&page=2
-    try {
-      final response = await http.get(Uri.parse(api));
-      Map responseList = json.decode(response.body);
-      lastPage = responseList['total_pages'];
-
-      List<CommentCard> commentCardList = [];
-      for (int i = 0; i < responseList['results'].length; i++) {
-        commentCardList.add(CommentCard(
-          authorUsername: responseList['results'][i]['author_details']['username'],
-          profilePicture: responseList['results'][i]['author_details']['avatar_path'],
-          reviewContent: responseList['results'][i]['content'],
-          reviewDate: responseList['results'][i]['created_at'],
-          reviewRating: responseList['results'][i]['author_details']['rating'].toString(),
-        ));
-      }
-      if (mounted) {
-        if (pageNumber < lastPage) {
-          setState(() {
-            isLastPage = commentCardList.length < 20;
-            loading = false;
-            pageNumber++;
-            // print("pageNum3 = $pageNumber");
-            reviewList.addAll(commentCardList);
-            resultCount = responseList['total_results'].toString();
-          });
-        }
-      }
-    } catch (e) {
-      loading = false;
-      error = true;
+  Future<String> fetchReviews(int? id) async {
+    final response = await http.get(Uri.parse("https://api.themoviedb.org/3/movie/${id!}/reviews?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US"));
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to load reviews');
     }
   }
 
@@ -180,9 +101,7 @@ class _CommentListState extends State<CommentList> {
           ElevatedButton(
             onPressed: () {
               setState(() {
-                loading = true;
-                error = false;
-                fetchReviews(widget.api);
+                fetchReviews(widget.id);
               });
             },
             child: Text(

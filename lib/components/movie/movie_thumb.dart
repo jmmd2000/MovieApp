@@ -1,65 +1,92 @@
+// This displays a movie poster and when tapped it brings the
+// user to a MoviePage of the movie it displays. Once the user rates
+// a movie, these will update with the rating.
+
+import 'package:api/components/functions/check_if_rated.dart';
 import 'package:flutter/material.dart';
-import '../../pages/movie_page.dart';
-import '../../colours.dart';
-import '../functions/round_rating.dart';
-import '../functions/get_image.dart';
+import 'package:api/main.dart';
+import 'package:api/pages/movie_page.dart';
+import 'package:api/colours.dart';
+import 'package:api/components/functions/movie.dart';
+import 'package:api/components/functions/round_rating.dart';
+import 'package:api/components/functions/get_image.dart';
 import 'dart:core';
 
 class MovieThumb extends StatefulWidget {
-  final String posterPath;
-  final String rating;
-  final String movieId;
-  const MovieThumb({super.key, required this.posterPath, required this.rating, required this.movieId});
+  final Movie movie;
+  final String? previousRoute;
+  final Function? callback;
+  const MovieThumb({
+    super.key,
+    required this.movie,
+    this.previousRoute,
+    this.callback,
+  });
 
   @override
   State<MovieThumb> createState() => _MovieThumbState();
 }
 
 class _MovieThumbState extends State<MovieThumb> {
-  late double ratingRounded = double.parse(widget.rating);
+  late double ratingRounded = double.parse(widget.movie.userRating!);
   String ratingString = "";
-  _MovieThumbState();
+  String userRating = "";
+
+  @override
+  void initState() {
+    super.initState();
+    userRating = checkIfRated(widget.movie.id, ratingsList);
+  }
 
   @override
   Widget build(BuildContext context) {
-    ratingString = widget.rating.toString();
-    int count = 0;
+    ratingString = widget.movie.userRating.toString();
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => MoviePage(
-                    api: 'https://api.themoviedb.org/3/movie/${widget.movieId}?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US',
-                    reviewsAPI: 'https://api.themoviedb.org/3/movie/${widget.movieId}/reviews?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US&page=1',
-                    movieID: widget.movieId,
-                    posterPath: widget.posterPath,
-                  )),
+            builder: (context) => MoviePage(
+              movie: widget.movie,
+              previousRoute: widget.previousRoute,
+            ),
+          ),
         );
       },
       child: Center(
         child: Stack(children: [
-          getMovieThumbImage(widget.posterPath),
-          // Image.network(
-          //   'https://image.tmdb.org/t/p/w500${widget.posterPath}',
-          //   height: 172,
-          //   width: 121,
-          //   fit: BoxFit.cover,
-          // ),
-          // Positioned(
-          //   top: 0,
-          //   right: 0,
-          //   child: Container(
-          //     padding: const EdgeInsets.only(left: 5, right: 5, top: 2, bottom: 2),
-          //     decoration: BoxDecoration(color: secondaryColour.withOpacity(0.9)),
-          //     child: Text(
-          //       (roundRating(widget.rating, count)),
-          //       style: const TextStyle(fontSize: 12, color: fontPrimary),
-          //     ),
-          //   ),
-          // ),
+          getMovieThumbImage(widget.movie.posterPath),
+          getRating(userRating) == true ? ratingBox(userRating) : const SizedBox.shrink(),
         ]),
       ),
     );
   }
+}
+
+bool getRating(rating) {
+  bool b = false;
+
+  if (rating.length > 0) {
+    b = true;
+  } else {
+    b = false;
+  }
+  return b;
+}
+
+Widget ratingBox(rating) {
+  double rating1 = double.parse(rating);
+  return Positioned(
+    top: 0,
+    right: 0,
+    child: Container(
+      padding: const EdgeInsets.only(left: 5, right: 5, top: 2, bottom: 2),
+      decoration: BoxDecoration(color: secondaryColour.withOpacity(0.9)),
+      child: Text(
+        (roundRating(rating1)),
+        style: const TextStyle(fontSize: 12, color: fontPrimary),
+      ),
+    ),
+  );
 }

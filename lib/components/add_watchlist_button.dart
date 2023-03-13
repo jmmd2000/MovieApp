@@ -1,27 +1,32 @@
-import 'package:api/components/functions/global.dart';
+// This button manages the watchlist state of a movie. It gets swapped with RemoveWatchlistButton
+// depending on if the movie is already added and just toggles a movies addition to
+// the watchlist.
+
 import 'package:api/components/movie/movie_thumb.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-
-import '../colours.dart';
+import 'package:api/colours.dart';
+import 'package:api/main.dart';
 import 'functions/db.dart';
+import 'functions/movie.dart';
 
 class AddWatchlistButton extends StatelessWidget {
-  final String movieID;
+  final Movie movie;
   final Function onSwap;
-  final String posterPath;
 
-  const AddWatchlistButton({super.key, required this.movieID, required this.onSwap, required this.posterPath});
+  const AddWatchlistButton({
+    super.key,
+    required this.movie,
+    required this.onSwap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
-        onPressed: (() {
-          bool success = addtoWatchlist(posterPath, movieID);
+        onPressed: (() async {
+          bool success = await addtoWatchlist(movie);
           if (success = true) {
             final snackBar = SnackBar(
+              duration: const Duration(seconds: 1),
               content: Row(children: const [
                 Icon(
                   Icons.done,
@@ -32,19 +37,15 @@ class AddWatchlistButton extends StatelessWidget {
                   child: Text('Added to watchlist'),
                 )
               ]),
-              // action: SnackBarAction(
-              //   label: 'Undo',
-              //   textColor: Colors.white,
-              //   onPressed: () {
-              //     deleteFromWatchlist(movieID);
-              //   },
-              // ),
               backgroundColor: secondaryColour,
             );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            resultList.add(MovieThumb(posterPath: posterPath, rating: "0", movieId: movieID));
+            watchList.add(MovieThumb(
+              movie: movie,
+            ));
           } else {
             final snackBar = SnackBar(
+              duration: const Duration(seconds: 1),
               content: Row(children: const [
                 Icon(
                   Icons.error_outline,

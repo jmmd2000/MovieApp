@@ -1,6 +1,6 @@
-# Untitled Movie App for Final Project
+# "RateFlix" Movie App for Final Project
 
-App for Android / IOS for tracking movies with a number of features:<br>
+App for Android for tracking movies with a number of features:<br>
 • Search for a specific movie<br>
 • Give it a rating or save it to a watchlist<br>
 • See the information about it (Cast, budget, release date etc.)<br>

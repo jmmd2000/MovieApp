@@ -48,6 +48,7 @@ class _MoviePageState extends State<MoviePage> {
   late bool hasReviews;
   bool discoverPrevious = false;
   IconButton backButton = const IconButton(onPressed: null, icon: Icon(Icons.star));
+  Map reviewMap = {};
 
   @override
   void initState() {
@@ -57,7 +58,7 @@ class _MoviePageState extends State<MoviePage> {
     futureReviews = fetchReviews(widget.movie.id);
     hasCast = false;
     hasReviews = false;
-    discoverPrevious = checkPreviousRoute();
+    // discoverPrevious = checkPreviousRoute();
   }
 
   @override
@@ -66,7 +67,7 @@ class _MoviePageState extends State<MoviePage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-        leading: backButton,
+        // leading: backButton,
       ),
       extendBodyBehindAppBar: true,
       body: Center(
@@ -307,6 +308,7 @@ class _MoviePageState extends State<MoviePage> {
                                   builder: (context, reviewSnapshot) {
                                     if (reviewSnapshot.hasData) {
                                       Map jsonMapReviews = json.decode(reviewSnapshot.data!);
+                                      reviewMap = jsonMapReviews;
                                       if (jsonMapReviews['results'].length > 0) {
                                         int ranNum = randomNumber(0, jsonMapReviews['results'].length);
 
@@ -370,12 +372,14 @@ class _MoviePageState extends State<MoviePage> {
                           : const SizedBox.shrink(),
                     ],
                   ),
-                  MoviePageSection(children: [
-                    MovieSlider(
-                      sliderTitle: "Similar Movies",
-                      api: "https://api.themoviedb.org/3/movie/${widget.movie.id}/recommendations?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US&page=1",
-                    )
-                  ])
+                  reviewMap.isNotEmpty
+                      ? MoviePageSection(children: [
+                          MovieSlider(
+                            sliderTitle: "Similar Movies",
+                            api: "https://api.themoviedb.org/3/movie/${widget.movie.id}/recommendations?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US&page=1",
+                          )
+                        ])
+                      : const SizedBox.shrink(),
                 ],
               );
             }
@@ -414,13 +418,14 @@ class _MoviePageState extends State<MoviePage> {
 
   Future<String> fetchReviews(int? id) async {
     final response = await http.get(Uri.parse("https://api.themoviedb.org/3/movie/${id!}/reviews?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US"));
-    if (response.statusCode == 200) {
+    Map reviews = json.decode(response.body);
+    if (reviews['results'].isNotEmpty) {
       setState(() {
         hasReviews = true;
       });
       return response.body;
     } else {
-      throw Exception('Failed to load reviews');
+      return response.body;
     }
   }
 
@@ -428,11 +433,15 @@ class _MoviePageState extends State<MoviePage> {
     final response = await http.get(Uri.parse("https://api.themoviedb.org/3/movie/${id!}/credits?api_key=21cc517d0bad572120d1663613b3a1a7&language=en-US"));
     if (response.statusCode == 200) {
       Map castData = json.decode(response.body);
+      if (castData.isNotEmpty) {
+        setState(() {
+          hasCast = true;
+        });
+      }
       for (int i = 0; i < castData['crew'].length; i++) {
         if (castData['crew'][i]['job'] == "Director") {
           setState(() {
             director = castData['crew'][i]['name'];
-            hasCast = true;
           });
         }
       }
@@ -472,40 +481,40 @@ class _MoviePageState extends State<MoviePage> {
     );
   }
 
-  bool checkPreviousRoute() {
-    if (widget.previousRoute == "Discover") {
-      setState(() {
-        backButton = IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const DiscoverPage(),
-            ),
-          ).then((value) async => {}),
-        );
-      });
-      return false;
-    } else if (widget.previousRoute == "Watchlist") {
-      setState(() {
-        backButton = IconButton(
-            icon: const Icon(Icons.car_crash),
-            onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SavedPage(),
-                  ),
-                ));
-      });
-      return false;
-    } else {
-      setState(() {
-        backButton = IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        );
-      });
-      return true;
-    }
-  }
+  // bool checkPreviousRoute() {
+  //   if (widget.previousRoute == "Discover") {
+  //     setState(() {
+  //       backButton = IconButton(
+  //         icon: const Icon(Icons.arrow_back),
+  //         onPressed: () => Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => const DiscoverPage(),
+  //           ),
+  //         ).then((value) async => {}),
+  //       );
+  //     });
+  //     return false;
+  //   } else if (widget.previousRoute == "Watchlist") {
+  //     setState(() {
+  //       backButton = IconButton(
+  //           icon: const Icon(Icons.car_crash),
+  //           onPressed: () => Navigator.push(
+  //                 context,
+  //                 MaterialPageRoute(
+  //                   builder: (context) => const SavedPage(),
+  //                 ),
+  //               ));
+  //     });
+  //     return false;
+  //   } else {
+  //     setState(() {
+  //       backButton = IconButton(
+  //         icon: const Icon(Icons.arrow_back),
+  //         onPressed: () => Navigator.pop(context),
+  //       );
+  //     });
+  //     return true;
+  //   }
+  // }
 }

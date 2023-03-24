@@ -6,8 +6,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+// The signInWithGoogle and signOut functions were adapted from code found in the FlutterFire docs
+// https://firebase.flutter.dev/docs/auth/social/
+
 final FirebaseAuth auth = FirebaseAuth.instance;
 // This function basically just logs the user in and returns true/false depending on if there is an error.
+
 Future<bool> signInWithGoogle(auth) async {
   try {
     UserCredential userCredential;

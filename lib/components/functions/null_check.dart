@@ -11,21 +11,3 @@ bool nullCheck(string) {
     return true;
   }
 }
-
-// This function is specifically for checking if the 'production_companies' array is empty
-String arrayCheckCountryOrigin(array) {
-  if (array.length != 0) {
-    String temp = array[0]['origin_country'];
-    if (temp == "null") {
-      return "N/A";
-    } else if (temp == "") {
-      return "N/A";
-    } else if (temp.isEmpty) {
-      return "N./A";
-    } else {
-      return temp;
-    }
-  } else {
-    return "N/A";
-  }
-}

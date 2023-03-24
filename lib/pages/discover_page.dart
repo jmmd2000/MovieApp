@@ -18,7 +18,7 @@ class DiscoverPage extends StatefulWidget {
 class _DiscoverPageState extends State<DiscoverPage> {
   List<MovieSlider> sliders = [];
 
-  late dynamic d;
+  // late dynamic d;
 
   @override
   initState() {
@@ -104,7 +104,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
       onWillPop: () async => false,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Discover"),
+          title: const Text("Discover"),
           actions: [searchButton(context)],
         ),
         body: getSliderList(sliders),
@@ -116,7 +116,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
   }
 
   Widget getSliderList(list) {
-    ////print("getSLIDERLIST CALLED");
     if (list.length != null) {
       return ListView.builder(
           cacheExtent: 3000.0,
@@ -129,9 +128,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
             );
           });
     } else {
-      return Text(
+      return const Text(
         "ERROR",
-        style: const TextStyle(color: fontPrimary),
+        style: TextStyle(color: fontPrimary),
       );
     }
   }

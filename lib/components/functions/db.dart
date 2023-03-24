@@ -22,10 +22,11 @@ void storeUser() {
     "uid": auth.currentUser!.uid,
   };
 
-  try {
-    db.collection("users").add(user).then((DocumentReference doc) => {});
-  } catch (error) {
-  } finally {}
+  db.collection("users").where("uid", isEqualTo: auth.currentUser!.uid).get().then((snapshot) {
+    if (snapshot.size < 1) {
+      db.collection("users").add(user).then((DocumentReference doc) => {});
+    }
+  });
 }
 
 Future<bool> deleteFromWatchlist(id) async {
@@ -40,7 +41,8 @@ Future<bool> deleteFromWatchlist(id) async {
     return false;
   } finally {
     watchList.removeWhere((movieThumb) => movieThumb.movie.id == id);
-    watchList = await fetchWatchlist();
+    appSetup();
+    // watchList = await fetchWatchlist();
 
     return true;
   }
@@ -67,7 +69,8 @@ Future<bool> addtoWatchlist(Movie movie) async {
     return false;
   } finally {
     watchList.add(MovieThumb(movie: movie));
-    watchList = await fetchWatchlist();
+    appSetup();
+    // watchList = await fetchWatchlist();
     return true;
   }
 }
@@ -77,7 +80,9 @@ Future<List<MovieThumb>> fetchWatchlist() async {
   List<MovieThumb> watchlist = [];
 
   db.collection("watchlist").where("uid", isEqualTo: auth.currentUser!.uid).get().then((snapshot) {
+    print("SIZE=${snapshot.size}");
     if (snapshot.size < 1) {
+      return watchlist;
     } else {
       snapshot.docs.forEach((doc) {
         String s = checkIfRated(doc['id'].toString(), ratingsList);
@@ -114,8 +119,9 @@ Future<bool> addtoRatings(movie, userRating, Function onSwap) async {
   } catch (error) {
     return false;
   }
+  appSetup();
 
-  ratingsList = await fetchRatings();
+  // ratingsList = await fetchRatings();
 
   return true;
 }
@@ -130,8 +136,9 @@ Future<bool> updateRatings(movie, userRating) async {
   } catch (error) {
     return false;
   }
+  appSetup();
 
-  ratingsList = await fetchRatings();
+  // ratingsList = await fetchRatings();
   return true;
 }
 
@@ -147,7 +154,9 @@ Future<bool> deleteFromRatings(id) async {
     return false;
   } finally {
     ratingsList.removeWhere((element) => element.movie.id == id);
-    ratingsList = await fetchRatings();
+    appSetup();
+
+    // ratingsList = await fetchRatings();
 
     return true;
   }
@@ -156,9 +165,9 @@ Future<bool> deleteFromRatings(id) async {
 Future<List<MovieThumb>> fetchRatings() async {
   QuerySnapshot snapshot;
   List<MovieThumb> ratings = [];
-
   db.collection("ratings").where("uid", isEqualTo: auth.currentUser!.uid).get().then((snapshot) {
     if (snapshot.size < 1) {
+      return ratings;
     } else {
       snapshot.docs.forEach((doc) {
         var d = doc.data();

@@ -29,19 +29,17 @@ class MovieThumb extends StatefulWidget {
 
 class _MovieThumbState extends State<MovieThumb> {
   late double ratingRounded = double.parse(widget.movie.userRating!);
-  String ratingString = "";
+  // String ratingString = "";
   String userRating = "";
 
   @override
   void initState() {
     super.initState();
-    userRating = checkIfRated(widget.movie.id, ratingsList);
   }
 
   @override
   Widget build(BuildContext context) {
-    ratingString = widget.movie.userRating.toString();
-
+    userRating = checkIfRated(widget.movie.id, ratingsList);
     return GestureDetector(
       onTap: () {
         Navigator.push(

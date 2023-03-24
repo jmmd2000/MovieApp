@@ -43,6 +43,7 @@ class _LoginPageState extends State<LoginPage> {
             Center(
               child: Column(
                 children: [
+                  // This SignInButton widget is from the flutter_signin_button package
                   SignInButton(
                     Buttons.Google,
                     text: "Sign in with Google",

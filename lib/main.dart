@@ -1,5 +1,6 @@
 // This is the root of the app and performs the apps setup
 
+import 'package:api/components/functions/shared_preferences.dart';
 import 'package:api/pages/discover_page.dart';
 import 'package:api/pages/login_page.dart';
 import 'package:api/pages/ratings_page.dart';
@@ -16,6 +17,7 @@ import 'components/functions/db.dart';
 
 List<MovieThumb> watchList = [];
 List<MovieThumb> ratingsList = [];
+List<String> searchHistory = [];
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +31,7 @@ void main() async {
     MaterialApp(
       home: const App(),
       title: 'RateFlix',
+      debugShowCheckedModeBanner: false,
       routes: {
         'Discover': (context) => const DiscoverPage(),
         'Login': (context) => const LoginPage(),
@@ -77,4 +80,5 @@ class _AppState extends State<App> {
 appSetup() async {
   ratingsList = await fetchRatings();
   watchList = await fetchWatchlist();
+  searchHistory = await fetchSearchHistory();
 }

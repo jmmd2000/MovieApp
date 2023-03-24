@@ -6,8 +6,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:api/colours.dart';
 import 'package:api/components/functions/check_if_rated.dart';
+import 'package:api/components/functions/get_image.dart';
 import 'package:api/components/functions/movie.dart';
+import 'package:api/components/functions/shared_preferences.dart';
 import 'package:api/components/movie/movie_thumb.dart';
+import 'package:api/components/searchHistory.dart';
 import 'package:api/components/sort_menu.dart';
 import 'package:api/main.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +31,7 @@ class _SearchPageState extends State<SearchPage> {
   bool menuDropdownOpen = false;
   bool menuTextFade = false;
   bool searchActive = false;
+  var textController = TextEditingController();
 
   String apiURL = 'https://api.themoviedb.org/3/search/movie?language=en-US&query={...}&page={*}&include_adult=false&api_key=21cc517d0bad572120d1663613b3a1a7';
 
@@ -42,6 +46,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
@@ -67,6 +72,7 @@ class _SearchPageState extends State<SearchPage> {
             children: [
               Expanded(
                 child: TextField(
+                  controller: textController,
                   style: const TextStyle(color: Colors.white),
                   cursorColor: secondaryColour,
                   decoration: InputDecoration(
@@ -78,11 +84,12 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                   onSubmitted: (value) async {
-                    setState(() {
-                      searchActive = true;
-                      loading = true;
-                      fetchResults(value);
-                    });
+                    // setState(() {
+                    //   searchActive = true;
+                    //   loading = true;
+                    //   fetchResults(value);
+                    // });
+                    search(value, false);
                   },
                 ),
               ),
@@ -99,6 +106,34 @@ class _SearchPageState extends State<SearchPage> {
               userRating: false,
             ),
             searchActive ? buildResults() : const SizedBox.shrink(),
+            searchActive
+                ? const SizedBox.shrink()
+                : Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Center(
+                        child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: randomPlaceholderImage(),
+                        ),
+                        const Text(
+                          "Search for a movie!",
+                          style: TextStyle(color: fontPrimary, fontSize: 22),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Divider(
+                            color: secondaryColour,
+                          ),
+                        ),
+                        SearchHistory(
+                          history: searchHistory,
+                          search: search,
+                        ),
+                      ],
+                    )),
+                  ),
           ],
         ));
   }
@@ -149,6 +184,8 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> fetchResults(String query) async {
+    saveToSearchHistory(query, refreshSort);
+    print(searchHistory);
     List<MovieThumb> movieThumbList = [];
 
     try {
@@ -221,5 +258,22 @@ class _SearchPageState extends State<SearchPage> {
 
   void refreshSort() {
     setState(() {});
+  }
+
+  void search(query, fromCallback) {
+    if (fromCallback) {
+      setState(() {
+        textController.text = query;
+        searchActive = true;
+        loading = true;
+        fetchResults(query);
+      });
+    } else {
+      setState(() {
+        searchActive = true;
+        loading = true;
+        fetchResults(query);
+      });
+    }
   }
 }

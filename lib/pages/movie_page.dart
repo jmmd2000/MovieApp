@@ -400,8 +400,15 @@ class _MoviePageState extends State<MoviePage> {
         movie: widget.movie,
         watchList: watchList,
         ratingsList: ratingsList,
+        updatePage: updatePage,
       ),
     );
+  }
+
+  void updatePage() {
+    setState(() {
+      hasUserRating = (checkIfRated(widget.movie.id!.toString(), ratingsList) != "");
+    });
   }
 
   Future<String> fetchMovie(int? id) async {
@@ -480,41 +487,4 @@ class _MoviePageState extends State<MoviePage> {
       ),
     );
   }
-
-  // bool checkPreviousRoute() {
-  //   if (widget.previousRoute == "Discover") {
-  //     setState(() {
-  //       backButton = IconButton(
-  //         icon: const Icon(Icons.arrow_back),
-  //         onPressed: () => Navigator.push(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (context) => const DiscoverPage(),
-  //           ),
-  //         ).then((value) async => {}),
-  //       );
-  //     });
-  //     return false;
-  //   } else if (widget.previousRoute == "Watchlist") {
-  //     setState(() {
-  //       backButton = IconButton(
-  //           icon: const Icon(Icons.car_crash),
-  //           onPressed: () => Navigator.push(
-  //                 context,
-  //                 MaterialPageRoute(
-  //                   builder: (context) => const SavedPage(),
-  //                 ),
-  //               ));
-  //     });
-  //     return false;
-  //   } else {
-  //     setState(() {
-  //       backButton = IconButton(
-  //         icon: const Icon(Icons.arrow_back),
-  //         onPressed: () => Navigator.pop(context),
-  //       );
-  //     });
-  //     return true;
-  //   }
-  // }
 }

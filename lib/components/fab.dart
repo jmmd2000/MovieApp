@@ -15,12 +15,14 @@ class FabMenu extends StatefulWidget {
 
   final List<MovieThumb> watchList;
   final List<MovieThumb> ratingsList;
+  final Function updatePage;
 
   const FabMenu({
     super.key,
     required this.watchList,
     required this.ratingsList,
     required this.movie,
+    required this.updatePage,
   });
 
   @override
@@ -151,11 +153,13 @@ class FabMenuState extends State<FabMenu> with SingleTickerProviderStateMixin {
                   movie: widget.movie,
                   onSwap: toggleRatings,
                   cntxt: context,
+                  updatePage: widget.updatePage,
                 )
               : ManageRatingsButton(
                   movie: widget.movie,
                   onSwap: toggleRatings,
                   cntxt: context,
+                  updatePage: widget.updatePage,
                 ),
         ),
         toggle(),

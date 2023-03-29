@@ -9,8 +9,9 @@ class ManageRatingsButton extends StatefulWidget {
   final BuildContext cntxt;
   final Movie movie;
   final Function onSwap;
+  final Function updatePage;
 
-  const ManageRatingsButton({super.key, required this.cntxt, required this.movie, required this.onSwap});
+  const ManageRatingsButton({super.key, required this.cntxt, required this.movie, required this.onSwap, required this.updatePage});
 
   @override
   State<ManageRatingsButton> createState() => _ManageRatingsButtonState();
@@ -30,7 +31,7 @@ class _ManageRatingsButtonState extends State<ManageRatingsButton> {
   Widget build(BuildContext context) {
     return FloatingActionButton(
       onPressed: (() {
-        optionDialog(widget.cntxt, callback, widget.movie, widget.onSwap);
+        optionDialog(widget.cntxt, callback, widget.movie, widget.onSwap, widget.updatePage);
       }),
       tooltip: 'Manage rating',
       heroTag: "ratingManageButton",

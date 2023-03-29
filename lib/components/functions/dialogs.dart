@@ -6,7 +6,7 @@ import 'package:api/components/functions/db.dart';
 import 'package:api/components/functions/movie.dart';
 import 'package:flutter/material.dart';
 
-Map ratingDialog(BuildContext context, Function callback, Movie movie, bool updateOrRate, Function onSwap) {
+Map ratingDialog(BuildContext context, Function callback, Movie movie, bool updateOrRate, Function onSwap, Function updatePage) {
   final TextEditingController textController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   Map snackbarMessage = {};
@@ -53,7 +53,7 @@ Map ratingDialog(BuildContext context, Function callback, Movie movie, bool upda
                 child: ElevatedButton(
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
-                      updateOrRate ? addtoRatings(movie, textController.text, onSwap) : updateRatings(movie, textController.text);
+                      updateOrRate ? addtoRatings(movie, textController.text, onSwap, updatePage) : updateRatings(movie, textController.text, updatePage);
                       updateOrRate ? onSwap() : null;
                       updateOrRate ? snackbarMessage = {"rating": textController.text, "updateOrRate": 1} : snackbarMessage = {"rating": textController.text, "updateOrRate": 2};
 
@@ -72,7 +72,7 @@ Map ratingDialog(BuildContext context, Function callback, Movie movie, bool upda
   return snackbarMessage;
 }
 
-optionDialog(BuildContext context, Function callback, Movie movie, Function onSwap) {
+optionDialog(BuildContext context, Function callback, Movie movie, Function onSwap, Function updatePage) {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController textController = TextEditingController();
 
@@ -94,7 +94,7 @@ optionDialog(BuildContext context, Function callback, Movie movie, Function onSw
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    ratingDialog(context, callback, movie, false, onSwap);
+                    ratingDialog(context, callback, movie, false, onSwap, updatePage);
                   },
                   child: const Text('Update'),
                 ),
@@ -106,8 +106,8 @@ optionDialog(BuildContext context, Function callback, Movie movie, Function onSw
                     Navigator.pop(context);
                     deleteDialog(context, movie, onSwap);
                   },
-                  child: const Text('Delete'),
                   style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
+                  child: const Text('Delete'),
                 ),
               ),
             ],
@@ -150,8 +150,8 @@ deleteDialog(BuildContext context, Movie movie, Function onSwap) {
                           Navigator.pop(context);
                           onSwap();
                         },
-                        child: const Text('Yes'),
                         style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
+                        child: const Text('Yes'),
                       ),
                     ),
                     Padding(

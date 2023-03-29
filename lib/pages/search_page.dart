@@ -84,11 +84,6 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                   onSubmitted: (value) async {
-                    // setState(() {
-                    //   searchActive = true;
-                    //   loading = true;
-                    //   fetchResults(value);
-                    // });
                     search(value, false);
                   },
                 ),

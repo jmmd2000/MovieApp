@@ -42,7 +42,6 @@ Future<bool> deleteFromWatchlist(id) async {
   } finally {
     watchList.removeWhere((movieThumb) => movieThumb.movie.id == id);
     appSetup();
-    // watchList = await fetchWatchlist();
 
     return true;
   }
@@ -70,7 +69,6 @@ Future<bool> addtoWatchlist(Movie movie) async {
   } finally {
     watchList.add(MovieThumb(movie: movie));
     appSetup();
-    // watchList = await fetchWatchlist();
     return true;
   }
 }
@@ -98,7 +96,7 @@ Future<List<MovieThumb>> fetchWatchlist() async {
   return watchlist;
 }
 
-Future<bool> addtoRatings(movie, userRating, Function onSwap) async {
+Future<bool> addtoRatings(movie, userRating, Function onSwap, Function updatePage) async {
   var m = <String, dynamic>{
     "uid": auth.currentUser!.uid,
     "rating": userRating,
@@ -120,13 +118,12 @@ Future<bool> addtoRatings(movie, userRating, Function onSwap) async {
     return false;
   }
   appSetup();
-
-  // ratingsList = await fetchRatings();
+  updatePage();
 
   return true;
 }
 
-Future<bool> updateRatings(movie, userRating) async {
+Future<bool> updateRatings(movie, userRating, Function updatePage) async {
   try {
     var docRef = db.collection("ratings").where("id", isEqualTo: movie.id).get().then((querySnapshot) {
       querySnapshot.docs.forEach((doc) {
@@ -137,8 +134,8 @@ Future<bool> updateRatings(movie, userRating) async {
     return false;
   }
   appSetup();
+  updatePage();
 
-  // ratingsList = await fetchRatings();
   return true;
 }
 
@@ -155,8 +152,6 @@ Future<bool> deleteFromRatings(id) async {
   } finally {
     ratingsList.removeWhere((element) => element.movie.id == id);
     appSetup();
-
-    // ratingsList = await fetchRatings();
 
     return true;
   }

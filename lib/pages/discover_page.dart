@@ -18,8 +18,6 @@ class DiscoverPage extends StatefulWidget {
 class _DiscoverPageState extends State<DiscoverPage> {
   List<MovieSlider> sliders = [];
 
-  // late dynamic d;
-
   @override
   initState() {
     super.initState();

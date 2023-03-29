@@ -11,8 +11,9 @@ class AddRatingsButton extends StatefulWidget {
   final BuildContext cntxt;
   final Movie movie;
   final Function onSwap;
+  final Function updatePage;
 
-  const AddRatingsButton({super.key, required this.cntxt, required this.movie, required this.onSwap});
+  const AddRatingsButton({super.key, required this.cntxt, required this.movie, required this.onSwap, required this.updatePage});
 
   @override
   State<AddRatingsButton> createState() => _AddRatingsButtonState();
@@ -32,7 +33,7 @@ class _AddRatingsButtonState extends State<AddRatingsButton> {
   Widget build(BuildContext context) {
     return FloatingActionButton(
         onPressed: (() {
-          Map success = ratingDialog(widget.cntxt, callback, widget.movie, true, widget.onSwap);
+          Map success = ratingDialog(widget.cntxt, callback, widget.movie, true, widget.onSwap, widget.updatePage);
 
           switch (success["updateOrRate"]) {
             case 1:

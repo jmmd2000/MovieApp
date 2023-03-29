@@ -29,7 +29,6 @@ class MovieThumb extends StatefulWidget {
 
 class _MovieThumbState extends State<MovieThumb> {
   late double ratingRounded = double.parse(widget.movie.userRating!);
-  // String ratingString = "";
   String userRating = "";
 
   @override

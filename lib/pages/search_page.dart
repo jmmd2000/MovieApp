@@ -180,7 +180,6 @@ class _SearchPageState extends State<SearchPage> {
 
   Future<void> fetchResults(String query) async {
     saveToSearchHistory(query, refreshSort);
-    print(searchHistory);
     List<MovieThumb> movieThumbList = [];
 
     try {

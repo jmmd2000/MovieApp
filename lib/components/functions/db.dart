@@ -78,7 +78,6 @@ Future<List<MovieThumb>> fetchWatchlist() async {
   List<MovieThumb> watchlist = [];
 
   db.collection("watchlist").where("uid", isEqualTo: auth.currentUser!.uid).get().then((snapshot) {
-    print("SIZE=${snapshot.size}");
     if (snapshot.size < 1) {
       return watchlist;
     } else {

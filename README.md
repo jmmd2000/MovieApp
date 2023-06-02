@@ -10,3 +10,5 @@ App for Android for tracking movies with a number of features:<br>
 Future features:<br>
 • Friend system<br>
 • Chat system<br>
+
+App apk can be downloaded from [here.](https://drive.google.com/file/d/1RZN__7yuU63HEsPrBZvef0P7x1vSyOp-/view?usp=sharing)
